@@ -1,0 +1,16 @@
+apiVersion: v2
+name: edc
+description: A Helm chart for deploying an EDC for the BPDM environment
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+dependencies:
+  - name: tractusx-connector
+    alias: txdc
+    version: 0.2.0
+    repository: https://catenax-ng.github.io/product-edc
+  - name: postgresql
+    version: 11.9.1
+    repository: https://charts.bitnami.com/bitnami
+    alias: postgres
+    condition: postgres.enabled
