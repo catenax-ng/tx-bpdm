@@ -28,13 +28,13 @@ txdc:
       url: "https://vault.demo.catena-x.net"
       token: ""
       paths:
-        secret: "/v1/bpdm/dev/edc"
+        secret: "/v1/edc"
       healthCheck:
         enabled: true
         standbyOk: true
   daps:
-    url: "https://daps1.dev.demo.catena-x.net/"
+    url: "https://daps1.int.demo.catena-x.net/"
   backendService:
-    httpProxyTokenReceiverUrl: "http://txdc-backend"
+    httpProxyTokenReceiverUrl: "http://localhost:8181"
   serviceAccount:
     create: false

@@ -2,7 +2,7 @@ txdc:
   dataplane:
     ingresses:
       - enabled: true
-        hostname: "gate-edc.dev.demo.catena-x.net"
+        hostname: "sharing-member-edc.dev.demo.catena-x.net"
         endpoints:
           - public
         className: "nginx"
@@ -11,12 +11,9 @@ txdc:
           enabled: true
           secretName: tls-secret
   controlplane:
-    endpoints:
-      data:
-        authKey: <path:bpdm/data/dev/edc#controlplane-auth>
     ingresses:
       - enabled: true
-        hostname: "gate-edc.dev.demo.catena-x.net"
+        hostname: "sharing-member-edc.dev.demo.catena-x.net"
         endpoints:
           - data
           - ids
@@ -26,15 +23,17 @@ txdc:
           enabled: true
           secretName: tls-secret
   daps:
-    clientId: 99:83:A7:17:86:FF:98:93:CE:A0:DD:A1:F1:36:FA:F6:0F:75:0A:23:keyid:99:83:A7:17:86:FF:98:93:CE:A0:DD:A1:F1:36:FA:F6:0F:75:0A:23
+    clientId: 83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A
   postgresql:
     jdbcUrl: "jdbc:postgresql://gate-txdc-postgres:5432/edc"
   vault:
     hashicorp:
-      token:  <path:bpdm/data/dev/edc#vault-token>
+      token: <path:bpdm/data/dev/edc/sharing-member#vault-token>
+      paths:
+        secret: "/v1/bpdm/dev/edc/sharing-member"
     secretNames:
-      dapsPrivateKey: OAUTH_PRIVATE_KEY_ALIAS
-      dapsPublicKey: OAUTH_PUBLIC_KEY_ALIAS
+      dapsPrivateKey: DAPS_PRIVATE_KEY
+      dapsPublicKey: DAPS_PUBLIC_KEY
       transferProxyTokenEncryptionAesKey: DATA_ENCRYPTION_KEYS_ALIAS
       transferProxyTokenSignerPrivateKey: TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS
       transferProxyTokenSignerPublicKey: TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS

@@ -1,0 +1,39 @@
+txdc:
+  dataplane:
+    ingresses:
+      - enabled: true
+        hostname: "gate-edc.dev.demo.catena-x.net"
+        endpoints:
+          - public
+        className: "nginx"
+        # -- Enables TLS on the ingress resource
+        tls:
+          enabled: true
+          secretName: tls-secret
+  controlplane:
+    ingresses:
+      - enabled: true
+        hostname: "gate-edc.dev.demo.catena-x.net"
+        endpoints:
+          - data
+          - ids
+        className: "nginx"
+        # -- Enables TLS on the ingress resource
+        tls:
+          enabled: true
+          secretName: tls-secret
+  daps:
+    clientId: 83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A
+  postgresql:
+    jdbcUrl: "jdbc:postgresql://gate-txdc-postgres:5432/edc"
+  vault:
+    hashicorp:
+      token: <path:bpdm/data/dev/edc/gate#vault-token>
+      paths:
+        secret: "/v1/bpdm/dev/edc/gate"
+    secretNames:
+      dapsPrivateKey: DAPS_PRIVATE_KEY
+      dapsPublicKey: DAPS_PUBLIC_KEY
+      transferProxyTokenEncryptionAesKey: DATA_ENCRYPTION_KEYS_ALIAS
+      transferProxyTokenSignerPrivateKey: TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS
+      transferProxyTokenSignerPublicKey: TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS
