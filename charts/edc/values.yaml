@@ -1,3 +1,9 @@
+backend:
+  enabled: true
+  service:
+    frontend:
+      port: 80
+
 postgres:
   enabled: true
   auth:
@@ -35,6 +41,6 @@ txdc:
   daps:
     url: "https://daps1.int.demo.catena-x.net/"
   backendService:
-    httpProxyTokenReceiverUrl: "http://localhost:8181"
+    httpProxyTokenReceiverUrl: "http://txdc-backend"
   serviceAccount:
     create: false

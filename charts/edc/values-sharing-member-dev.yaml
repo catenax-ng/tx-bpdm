@@ -25,7 +25,7 @@ txdc:
   daps:
     clientId: 83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A
   postgresql:
-    jdbcUrl: "jdbc:postgresql://gate-txdc-postgres:5432/edc"
+    jdbcUrl: "jdbc:postgresql://sharing-member-txdc-postgres:5432/edc"
   vault:
     hashicorp:
       token: <path:bpdm/data/dev/edc/sharing-member#vault-token>

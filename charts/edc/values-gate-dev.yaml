@@ -35,5 +35,5 @@ txdc:
       dapsPrivateKey: DAPS_PRIVATE_KEY
       dapsPublicKey: DAPS_PUBLIC_KEY
       transferProxyTokenEncryptionAesKey: DATA_ENCRYPTION_KEYS_ALIAS
-      transferProxyTokenSignerPrivateKey: TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS
-      transferProxyTokenSignerPublicKey: TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS
+      transferProxyTokenSignerPrivateKey: DAPS_PRIVATE_KEY
+      transferProxyTokenSignerPublicKey: DAPS_PUBLIC_KEY

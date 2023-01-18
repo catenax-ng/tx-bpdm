@@ -9,6 +9,10 @@ dependencies:
     alias: txdc
     version: 0.2.0
     repository: https://catenax-ng.github.io/product-edc
+  - name: backend-service
+    alias: backend
+    version: "0.0.5"
+    repository: https://denisneuling.github.io/cx-backend-service
   - name: postgresql
     version: 11.9.1
     repository: https://charts.bitnami.com/bitnami
