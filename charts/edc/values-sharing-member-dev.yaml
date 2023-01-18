@@ -11,6 +11,9 @@ txdc:
           enabled: true
           secretName: tls-secret
   controlplane:
+    endpoints:
+      data:
+        authKey: <path:bpdm/data/dev/edc/sharing-member#controlplane-auth>
     ingresses:
       - enabled: true
         hostname: "sharing-member-edc.dev.demo.catena-x.net"

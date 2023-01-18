@@ -11,6 +11,9 @@ txdc:
           enabled: true
           secretName: tls-secret
   controlplane:
+    endpoints:
+      data:
+        authKey: <path:bpdm/data/dev/edc/gate#controlplane-auth>
     ingresses:
       - enabled: true
         hostname: "gate-edc.dev.demo.catena-x.net"
