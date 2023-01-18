@@ -1,8 +1,16 @@
 backend:
+  ingress:
+    enabled: false
+    name: "txdc-backend"
+    annotations: { }
+    hosts: [ ]
+    tls: [ ]
   enabled: true
   service:
     frontend:
       port: 80
+    backend:
+      port: 8081
 
 postgres:
   enabled: true
@@ -39,7 +47,7 @@ txdc:
         enabled: true
         standbyOk: true
   daps:
-    url: "https://daps1.int.demo.catena-x.net/"
+    url: "https://daps1.int.demo.catena-x.net"
   backendService:
     httpProxyTokenReceiverUrl: "http://txdc-backend"
   serviceAccount:

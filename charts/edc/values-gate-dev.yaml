@@ -1,3 +1,16 @@
+backend:
+  ingress:
+    enabled: true
+    name: "edc-gate-backend"
+    hosts:
+      - host: gate-edc-backend.dev.demo.catena-x.net
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: tls-secret
+        hosts:
+          - gate-edc-backend.dev.demo.catena-x.net
 txdc:
   dataplane:
     ingresses:
@@ -27,16 +40,18 @@ txdc:
           secretName: tls-secret
   daps:
     clientId: 83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A
+  backendService:
+    httpProxyTokenReceiverUrl: "http://edc-gate-backend"
   postgresql:
-    jdbcUrl: "jdbc:postgresql://gate-txdc-postgres:5432/edc"
+    jdbcUrl: "jdbc:postgresql://edc-gate-postgres:5432/edc"
   vault:
     hashicorp:
       token: <path:bpdm/data/dev/edc/gate#vault-token>
       paths:
-        secret: "/v1/bpdm/dev/edc/gate"
+        secret: "/v1/bpdm"
     secretNames:
-      dapsPrivateKey: DAPS_PRIVATE_KEY
-      dapsPublicKey: DAPS_PUBLIC_KEY
-      transferProxyTokenEncryptionAesKey: DATA_ENCRYPTION_KEYS_ALIAS
-      transferProxyTokenSignerPrivateKey: DAPS_PRIVATE_KEY
-      transferProxyTokenSignerPublicKey: DAPS_PUBLIC_KEY
+      dapsPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
+      dapsPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY
+      transferProxyTokenEncryptionAesKey: dev/edc/gate/DATA_ENCRYPTION_KEYS_ALIAS
+      transferProxyTokenSignerPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
+      transferProxyTokenSignerPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY

@@ -1,3 +1,16 @@
+backend:
+  ingress:
+    enabled: true
+    name: "edc-sharing-member-backend"
+    hosts:
+      - host: sharing-member-edc-backend.dev.demo.catena-x.net
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: tls-secret
+        hosts:
+          - sharing-member-edc-backend.dev.demo.catena-x.net
 txdc:
   dataplane:
     ingresses:
@@ -26,17 +39,19 @@ txdc:
           enabled: true
           secretName: tls-secret
   daps:
-    clientId: 83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A
+    clientId: B6:FB:F8:24:80:DB:2E:CF:8B:B9:82:B2:20:28:B0:CC:28:BE:24:4B:keyid:B6:FB:F8:24:80:DB:2E:CF:8B:B9:82:B2:20:28:B0:CC:28:BE:24:4B
+  backendService:
+    httpProxyTokenReceiverUrl: "http://edc-sharing-member-backend"
   postgresql:
-    jdbcUrl: "jdbc:postgresql://sharing-member-txdc-postgres:5432/edc"
+    jdbcUrl: "jdbc:postgresql://edc-sharing-member-postgres:5432/edc"
   vault:
     hashicorp:
       token: <path:bpdm/data/dev/edc/sharing-member#vault-token>
       paths:
-        secret: "/v1/bpdm/dev/edc/sharing-member"
+        secret: "/v1/bpdm"
     secretNames:
-      dapsPrivateKey: DAPS_PRIVATE_KEY
-      dapsPublicKey: DAPS_PUBLIC_KEY
-      transferProxyTokenEncryptionAesKey: DATA_ENCRYPTION_KEYS_ALIAS
-      transferProxyTokenSignerPrivateKey: TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS
-      transferProxyTokenSignerPublicKey: TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS
+      dapsPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
+      dapsPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
+      transferProxyTokenEncryptionAesKey: dev/edc/sharing-member/DATA_ENCRYPTION_KEYS_ALIAS
+      transferProxyTokenSignerPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
+      transferProxyTokenSignerPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
