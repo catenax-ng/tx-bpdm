@@ -19,10 +19,10 @@ target
 #local database data
 /db
 #Helm dependencies
-/charts/bpdm/Chart.lock
-/charts/bpdm/charts/Chart.lock
-/charts/bpdm/charts/bpdm-gate/Chart.lock
-/charts/bpdm/charts/bpdm-pool/Chart.lock
+/charts/**/Chart.lock
+# ignore all dependency charts but not the actual charts directly under the bpdm umbrella chart
+!/charts/bpdm/charts
+/charts/**/charts
 #Developer application properties
 application-developer.properties
 *.drawio.svg.bkp

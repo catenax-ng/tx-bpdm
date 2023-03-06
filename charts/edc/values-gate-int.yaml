@@ -1,21 +1,8 @@
-backend:
-  ingress:
-    enabled: true
-    name: "edc-gate-backend"
-    hosts:
-      - host: gate-edc-backend.dev.demo.catena-x.net
-        paths:
-          - path: /
-            pathType: Prefix
-    tls:
-      - secretName: tls-secret
-        hosts:
-          - gate-edc-backend.dev.demo.catena-x.net
 txdc:
   dataplane:
     ingresses:
       - enabled: true
-        hostname: "gate-edc.dev.demo.catena-x.net"
+        hostname: "gate-edc.int.demo.catena-x.net"
         endpoints:
           - public
         className: "nginx"
@@ -29,7 +16,7 @@ txdc:
         authKey: <path:bpdm/data/dev/edc/gate#controlplane-auth>
     ingresses:
       - enabled: true
-        hostname: "gate-edc.dev.demo.catena-x.net"
+        hostname: "gate-edc.int.demo.catena-x.net"
         endpoints:
           - data
           - ids
@@ -55,3 +42,6 @@ txdc:
       transferProxyTokenEncryptionAesKey: dev/edc/gate/DATA_ENCRYPTION_KEYS_ALIAS
       transferProxyTokenSignerPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
       transferProxyTokenSignerPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY
+
+opensearch:
+  enabled: false

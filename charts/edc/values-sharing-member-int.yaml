@@ -1,21 +1,8 @@
-backend:
-  ingress:
-    enabled: true
-    name: "edc-sharing-member-backend"
-    hosts:
-      - host: sharing-member-edc-backend.dev.demo.catena-x.net
-        paths:
-          - path: /
-            pathType: Prefix
-    tls:
-      - secretName: tls-secret
-        hosts:
-          - sharing-member-edc-backend.dev.demo.catena-x.net
 txdc:
   dataplane:
     ingresses:
       - enabled: true
-        hostname: "sharing-member-edc.dev.demo.catena-x.net"
+        hostname: "sharing-member-edc.int.demo.catena-x.net"
         endpoints:
           - public
         className: "nginx"
@@ -29,7 +16,7 @@ txdc:
         authKey: <path:bpdm/data/dev/edc/sharing-member#controlplane-auth>
     ingresses:
       - enabled: true
-        hostname: "sharing-member-edc.dev.demo.catena-x.net"
+        hostname: "sharing-member-edc.int.demo.catena-x.net"
         endpoints:
           - data
           - ids
@@ -55,3 +42,18 @@ txdc:
       transferProxyTokenEncryptionAesKey: dev/edc/sharing-member/DATA_ENCRYPTION_KEYS_ALIAS
       transferProxyTokenSignerPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
       transferProxyTokenSignerPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
+
+opensearch:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    hosts:
+      - edc-sharing-member-backend.int.demo.catena-x.net
+    tls:
+      - secretName: tls-secret
+        hosts:
+          - edc-sharing-member-backend.int.demo.catena-x.net
+  masterService: ""
+  fullnameOverride: edc-sharing-member-backend

@@ -2,19 +2,20 @@ apiVersion: v2
 name: edc
 description: A Helm chart for deploying an EDC for the BPDM environment
 type: application
-version: 0.0.1
-appVersion: 0.0.1
+version: 0.0.2
+appVersion: 0.0.2
 dependencies:
   - name: tractusx-connector
     alias: txdc
-    version: 0.2.0
-    repository: https://catenax-ng.github.io/product-edc
-  - name: backend-service
-    alias: backend
-    version: "0.0.5"
-    repository: https://denisneuling.github.io/cx-backend-service
+    version: 0.4.1
+    repository: https://eclipse-tractusx.github.io/charts/dev
   - name: postgresql
     version: 11.9.1
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
+  - name: opensearch
+    version: 2.4.0
+    repository: https://opensearch-project.github.io/helm-charts/
+    alias: opensearch
+    condition: opensearch.enabled
