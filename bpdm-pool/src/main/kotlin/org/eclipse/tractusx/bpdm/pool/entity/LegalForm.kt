@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.entity.BaseEntity
 
 @Entity
 @Table(name = "legal_forms")
