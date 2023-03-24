@@ -15,12 +15,12 @@ CREATE TABLE "bpdm-gate".addresses (
 	site_external_id varchar(255) NULL,
 	character_set varchar(255) NOT NULL,
 	"language" varchar(255) NOT NULL,
-	CONSTRAINT addresses_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_84200qt69jmxdl03jgxbjx2y0 UNIQUE (bpn),
-	CONSTRAINT uk_jrhri6bt0pf6tjfingm6q69sq UNIQUE (uuid),
-	CONSTRAINT uk_pqltsn49n4x8uk85jgysvsb8q UNIQUE (site_external_id),
-	CONSTRAINT uk_qpesrk6tocdob1rtxhqnm95pt UNIQUE (legal_entity_external_id),
-	CONSTRAINT uk_sq4iq64fq7nh87bedjanlpflr UNIQUE (external_id)
+	CONSTRAINT pk_addresses PRIMARY KEY (id),
+	CONSTRAINT uc_addresses_bpn UNIQUE (bpn),
+	CONSTRAINT uc_addresses_uuid UNIQUE (uuid),
+	CONSTRAINT uc_addresses_site_external_id UNIQUE (site_external_id),
+	CONSTRAINT uc_addresses_legal_entity_external_id UNIQUE (legal_entity_external_id),
+	CONSTRAINT uc_addresses_external_id UNIQUE (external_id)
 );
 
 
@@ -37,9 +37,9 @@ CREATE TABLE "bpdm-gate".identifier_status (
 	uuid uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	technical_key varchar(255) NOT NULL,
-	CONSTRAINT identifier_status_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_9cl4snfjrfw83vu2ngy17w47h UNIQUE (uuid),
-	CONSTRAINT uk_l3v8y5eerkenti6d06t976c8f UNIQUE (technical_key)
+	CONSTRAINT pk_identifier_status PRIMARY KEY (id),
+	CONSTRAINT uc_identifier_status_uuid UNIQUE (uuid),
+	CONSTRAINT uc_identifier_status_technical_key UNIQUE (technical_key)
 );
 
 
@@ -57,8 +57,8 @@ CREATE TABLE "bpdm-gate".identifier_types (
 	"name" varchar(255) NOT NULL,
 	technical_key varchar(255) NOT NULL,
 	url varchar(255) NULL,
-	CONSTRAINT identifier_types_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_fnqds7oura6e9ctqgcaqvlp8l UNIQUE (uuid)
+	CONSTRAINT pk_identifier_types PRIMARY KEY (id),
+	CONSTRAINT uc_identifier_types_uuid UNIQUE (uuid)
 );
 
 
@@ -76,8 +76,8 @@ CREATE TABLE "bpdm-gate".issuing_bodies (
 	"name" varchar(255) NOT NULL,
 	technical_key varchar(255) NOT NULL,
 	url varchar(255) NULL,
-	CONSTRAINT issuing_bodies_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_5s7v0ym427b9i3ifcl81r0kx8 UNIQUE (uuid)
+	CONSTRAINT pk_issuing_bodies PRIMARY KEY (id),
+	CONSTRAINT uc_issuing_bodies_uuid UNIQUE (uuid)
 );
 
 
@@ -94,8 +94,8 @@ CREATE TABLE "bpdm-gate".legal_form_categories (
 	uuid uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	url varchar(255) NULL,
-	CONSTRAINT legal_form_categories_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_ibo9k8fk9qyxf2nxy9jl4n0dk UNIQUE (uuid)
+	CONSTRAINT pk_legal_form_categories PRIMARY KEY (id),
+	CONSTRAINT uc_legal_form_categories_uuid UNIQUE (uuid)
 );
 
 
@@ -115,8 +115,8 @@ CREATE TABLE "bpdm-gate".legal_forms (
 	"name" varchar(255) NULL,
 	technical_key varchar(255) NOT NULL,
 	url varchar(255) NULL,
-	CONSTRAINT legal_forms_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_towst0xttpmaixg7xk1ji5v2e UNIQUE (uuid)
+	CONSTRAINT pk_legal_forms PRIMARY KEY (id),
+	CONSTRAINT uc_legal_forms_uuid UNIQUE (uuid)
 );
 
 
@@ -133,9 +133,9 @@ CREATE TABLE "bpdm-gate".roles (
 	uuid uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	technical_key varchar(255) NOT NULL,
-	CONSTRAINT roles_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_bdys1vaxs0jqndxmixeragus8 UNIQUE (uuid),
-	CONSTRAINT uk_homhokf01vc3v3vmr60acknce UNIQUE (technical_key)
+	CONSTRAINT pk_roles PRIMARY KEY (id),
+	CONSTRAINT uc_roles_uuid UNIQUE (uuid),
+	CONSTRAINT uc_roles_technical_key UNIQUE (technical_key)
 );
 
 
@@ -148,10 +148,10 @@ CREATE TABLE "bpdm-gate".roles (
 CREATE TABLE "bpdm-gate".address_contexts (
 	address_id int8 NOT NULL,
 	context varchar(255) NOT NULL,
-	CONSTRAINT address_contexts_pkey PRIMARY KEY (address_id, context),
-	CONSTRAINT fk1t127o73bpa2eh9vfmrtgrqum FOREIGN KEY (address_id) REFERENCES "bpdm-gate".addresses(id)
+	CONSTRAINT pk_address_contexts PRIMARY KEY (address_id, context),
+	CONSTRAINT fk_address_contexts_on_address FOREIGN KEY (address_id) REFERENCES "bpdm-gate".addresses(id)
 );
-CREATE INDEX idxdyvn52j9bpwuaj3vqa31p1g75 ON "bpdm-gate".address_contexts USING btree (address_id);
+CREATE INDEX idx_dyvn52j9bpwuaj3vqa31p1g75 ON "bpdm-gate".address_contexts USING btree (address_id);
 
 
 -- "bpdm-gate".address_types definition
@@ -163,10 +163,10 @@ CREATE INDEX idxdyvn52j9bpwuaj3vqa31p1g75 ON "bpdm-gate".address_contexts USING 
 CREATE TABLE "bpdm-gate".address_types (
 	address_id int8 NOT NULL,
 	"type" varchar(255) NOT NULL,
-	CONSTRAINT address_types_pkey PRIMARY KEY (address_id, type),
-	CONSTRAINT fkjcajog5atsejjtaa487dmpopt FOREIGN KEY (address_id) REFERENCES "bpdm-gate".addresses(id)
+	CONSTRAINT pk_address_types PRIMARY KEY (address_id, type),
+	CONSTRAINT fk_address_types_on_address FOREIGN KEY (address_id) REFERENCES "bpdm-gate".addresses(id)
 );
-CREATE INDEX idx1crcquumt5redip9eiycd75re ON "bpdm-gate".address_types USING btree (address_id);
+CREATE INDEX idx_1crcquumt5redip9eiycd75re ON "bpdm-gate".address_types USING btree (address_id);
 
 
 -- "bpdm-gate".administrative_areas definition
@@ -187,11 +187,11 @@ CREATE TABLE "bpdm-gate".administrative_areas (
 	"type" varchar(255) NOT NULL,
 	value varchar(255) NOT NULL,
 	address_id int8 NOT NULL,
-	CONSTRAINT administrative_areas_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_oxh1af7od4k9ncu0qxwvdsol5 UNIQUE (uuid),
-	CONSTRAINT fk49paeu46kjeqyfuiwrfchv8v6 FOREIGN KEY (address_id) REFERENCES "bpdm-gate".addresses(id)
+	CONSTRAINT pk_administrative_areas PRIMARY KEY (id),
+	CONSTRAINT uc_administrative_areas_uuid UNIQUE (uuid),
+	CONSTRAINT fk_administrative_areas_on_address FOREIGN KEY (address_id) REFERENCES "bpdm-gate".addresses(id)
 );
-CREATE INDEX idxl6bj1ysuij6hm73m0r8cypyd9 ON "bpdm-gate".administrative_areas USING btree (address_id);
+CREATE INDEX idx_l6bj1ysuij6hm73m0r8cypyd9 ON "bpdm-gate".administrative_areas USING btree (address_id);
 
 
 -- "bpdm-gate".legal_entities definition
@@ -210,14 +210,14 @@ CREATE TABLE "bpdm-gate".legal_entities (
 	external_id varchar(255) NOT NULL,
 	legal_address_id int8 NOT NULL,
 	legal_form_id int8 NULL,
-	CONSTRAINT legal_entities_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_fn3cbtgn4mcc8qprvf6nc33rb UNIQUE (external_id),
-	CONSTRAINT uk_kr9fdq30p6pldlbqktqd6g58c UNIQUE (uuid),
-	CONSTRAINT uk_rs7me2py7dlci6yupo8bes1rc UNIQUE (bpn),
-	CONSTRAINT fkbv0qw6w82eoj9sdrcrhelcevd FOREIGN KEY (legal_address_id) REFERENCES "bpdm-gate".addresses(id),
-	CONSTRAINT fkc1b0nvelmc2p1j0g3co325pmv FOREIGN KEY (legal_form_id) REFERENCES "bpdm-gate".legal_forms(id)
+	CONSTRAINT pk_legal_entities PRIMARY KEY (id),
+	CONSTRAINT uc_legal_entities UNIQUE (external_id),
+	CONSTRAINT uc_legal_entities_uuid UNIQUE (uuid),
+	CONSTRAINT uc_legal_entities_bpn UNIQUE (bpn),
+	CONSTRAINT fk_legal_entities_on_address FOREIGN KEY (legal_address_id) REFERENCES "bpdm-gate".addresses(id),
+	CONSTRAINT fk_legal_entities_on_legal_forms FOREIGN KEY (legal_form_id) REFERENCES "bpdm-gate".legal_forms(id)
 );
-CREATE INDEX idxm9ojfna20safop6xndvj1510n ON "bpdm-gate".legal_entities USING btree (legal_form_id);
+CREATE INDEX idx_m9ojfna20safop6xndvj1510n ON "bpdm-gate".legal_entities USING btree (legal_form_id);
 
 
 -- "bpdm-gate".legal_entity_roles definition
@@ -229,11 +229,11 @@ CREATE INDEX idxm9ojfna20safop6xndvj1510n ON "bpdm-gate".legal_entities USING bt
 CREATE TABLE "bpdm-gate".legal_entity_roles (
 	legal_entity_id int8 NOT NULL,
 	role_id int8 NOT NULL,
-	CONSTRAINT legal_entity_roles_pkey PRIMARY KEY (legal_entity_id, role_id),
-	CONSTRAINT fkcr1umj7mb9hb3466vdfv8bk FOREIGN KEY (role_id) REFERENCES "bpdm-gate".roles(id),
-	CONSTRAINT fkq8ddj33yps085xt53wgmn6g33 FOREIGN KEY (legal_entity_id) REFERENCES "bpdm-gate".legal_entities(id)
+	CONSTRAINT pk_legal_entity_roles PRIMARY KEY (legal_entity_id, role_id),
+	CONSTRAINT fk_legal_entity_roles FOREIGN KEY (role_id) REFERENCES "bpdm-gate".roles(id),
+	CONSTRAINT fk_legal_entity_roles_on_legal_entities FOREIGN KEY (legal_entity_id) REFERENCES "bpdm-gate".legal_entities(id)
 );
-CREATE INDEX idxd5n7954r4y9rj77ru0vvxv35x ON "bpdm-gate".legal_entity_roles USING btree (legal_entity_id);
+CREATE INDEX idx_d5n7954r4y9rj77ru0vvxv35x ON "bpdm-gate".legal_entity_roles USING btree (legal_entity_id);
 
 
 -- "bpdm-gate".legal_entity_types definition
@@ -245,10 +245,10 @@ CREATE INDEX idxd5n7954r4y9rj77ru0vvxv35x ON "bpdm-gate".legal_entity_roles USIN
 CREATE TABLE "bpdm-gate".legal_entity_types (
 	legal_entity_id int8 NOT NULL,
 	"type" varchar(255) NOT NULL,
-	CONSTRAINT legal_entity_types_pkey PRIMARY KEY (legal_entity_id, type),
-	CONSTRAINT fkxfcusu50mh2877cu2g6qpjv9 FOREIGN KEY (legal_entity_id) REFERENCES "bpdm-gate".legal_entities(id)
+	CONSTRAINT pk_legal_entity_types PRIMARY KEY (legal_entity_id, type),
+	CONSTRAINT fk_legal_entity_types_on_legal_entities FOREIGN KEY (legal_entity_id) REFERENCES "bpdm-gate".legal_entities(id)
 );
-CREATE INDEX idxl90kj28xlq30e0gdq06rwsl06 ON "bpdm-gate".legal_entity_types USING btree (legal_entity_id);
+CREATE INDEX idx_l90kj28xlq30e0gdq06rwsl06 ON "bpdm-gate".legal_entity_types USING btree (legal_entity_id);
 
 
 -- "bpdm-gate".legal_forms_legal_categories definition
@@ -260,12 +260,12 @@ CREATE INDEX idxl90kj28xlq30e0gdq06rwsl06 ON "bpdm-gate".legal_entity_types USIN
 CREATE TABLE "bpdm-gate".legal_forms_legal_categories (
 	form_id int8 NOT NULL,
 	category_id int8 NOT NULL,
-	CONSTRAINT legal_forms_legal_categories_pkey PRIMARY KEY (form_id, category_id),
-	CONSTRAINT fk2ewel4bp6u90u8ofokig30uyn FOREIGN KEY (form_id) REFERENCES "bpdm-gate".legal_forms(id),
-	CONSTRAINT fk8tl7mijhb2hd6wv3qoaer2pe4 FOREIGN KEY (category_id) REFERENCES "bpdm-gate".legal_form_categories(id)
+	CONSTRAINT pklegal_forms_legal_categories PRIMARY KEY (form_id, category_id),
+	CONSTRAINT fk_legal_forms_legal_categories_on_legal_forms FOREIGN KEY (form_id) REFERENCES "bpdm-gate".legal_forms(id),
+	CONSTRAINT fk_legal_forms_legal_categories_on_legal_form_categories FOREIGN KEY (category_id) REFERENCES "bpdm-gate".legal_form_categories(id)
 );
-CREATE INDEX idx2vkekrtd36sp15dukkpjskh2m ON "bpdm-gate".legal_forms_legal_categories USING btree (form_id);
-CREATE INDEX idx4976357rtrnbtoc7dlqhw66c9 ON "bpdm-gate".legal_forms_legal_categories USING btree (category_id);
+CREATE INDEX idx_2vkekrtd36sp15dukkpjskh2m ON "bpdm-gate".legal_forms_legal_categories USING btree (form_id);
+CREATE INDEX idx_4976357rtrnbtoc7dlqhw66c9 ON "bpdm-gate".legal_forms_legal_categories USING btree (category_id);
 
 
 -- "bpdm-gate".localities definition
