@@ -29,6 +29,10 @@ class SiteGate(
     var bpn: String,
     @Column(name = "name", nullable = false)
     var name: String,
+    @Column(name = "external_id", nullable = false, unique = true)
+    var externalId: String,
+    @Column(name = "legal_entity_external_id", nullable = true, unique = true)
+    var legalEntityExternalId: String,
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntityGate,
