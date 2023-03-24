@@ -55,11 +55,11 @@ class AddressGate(
     var version: AddressVersionGate,
     @Embedded
     var geoCoordinates: GeographicCoordinateGate?,
-    @Column(name = "bpn", nullable = false, unique = true)
+    @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
-    @Column(name = "bpn", nullable = true, unique = true)
+    @Column(name = "legal_entity_external_id", nullable = true, unique = true)
     var legalEntityExternalId: String,
-    @Column(name = "bpn", nullable = true, unique = true)
+    @Column(name = "site_external_id", nullable = true, unique = true)
     var siteExternalId: String,
     @Column(name = "bpn", nullable = true, unique = true)
     var bpn: String,
