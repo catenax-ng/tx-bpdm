@@ -346,7 +346,7 @@ CREATE TABLE sites
      external_id              VARCHAR(255) NOT NULL,
      legal_entity_external_id VARCHAR(255) NULL,
      "name"                   VARCHAR(255) NOT NULL,
-     legal_entity_id          INT8 NOT NULL,
+--      legal_entity_id          INT8 NOT NULL,
      main_address_id          INT8 NOT NULL,
      CONSTRAINT pk_site PRIMARY KEY (id)
   );
@@ -366,8 +366,8 @@ ALTER TABLE sites
 ALTER TABLE sites
     ADD CONSTRAINT FK_SITES_ON_MAIN_ADDRESS FOREIGN KEY (main_address_id) REFERENCES addresses (id);
 
-ALTER TABLE sites
-    ADD CONSTRAINT FK_SITES_ON_LEGAL_ENTITY FOREIGN KEY (legal_entity_id) REFERENCES legal_entities (id);
+-- ALTER TABLE sites
+--     ADD CONSTRAINT FK_SITES_ON_LEGAL_ENTITY FOREIGN KEY (legal_entity_id) REFERENCES legal_entities (id);
 
 -- Thoroughfares Table
 CREATE TABLE thoroughfares

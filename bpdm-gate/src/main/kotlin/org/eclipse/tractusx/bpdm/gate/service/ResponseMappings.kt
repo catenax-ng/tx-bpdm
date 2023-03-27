@@ -19,15 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
-import org.eclipse.tractusx.bpdm.common.dto.AddressVersionDto
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 
 import org.springframework.data.domain.Page
@@ -48,6 +46,30 @@ fun AddressGate.toAddressGateInputRequest(): AddressGateInputRequest {
     )
 }
 
+fun AddressDto.toAddressGateDto(): AddressGate {
+
+    val geoCoords = this.geographicCoordinates?.let {
+        GeoCoordinateDto(
+            it.longitude,
+            it.latitude,
+            it.altitude
+        ).toGeographicCoordinateGate()
+    }
+
+    return AddressGate(
+        this.careOf,
+        this.contexts.toMutableSet(),
+        this.country,
+        this.types.toMutableSet(),
+        this.version.toAddressVersionGate(),
+        geoCoords,
+        "",
+        "",
+        "",
+        ""
+    )
+}
+
 fun AddressGateInputRequest.toAddressGate(): AddressGate {
 
     val geoCoords = this.address.geographicCoordinates?.let {
@@ -60,9 +82,9 @@ fun AddressGateInputRequest.toAddressGate(): AddressGate {
 
     return AddressGate(
         this.address.careOf,
-        this.address.contexts as MutableSet<String>,
+        this.address.contexts.toMutableSet(),
         this.address.country,
-        this.address.types as MutableSet<AddressType>,
+        this.address.types.toMutableSet(),
         this.address.version.toAddressVersionGate(),
         geoCoords,
         this.externalId,
@@ -92,6 +114,14 @@ fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
 
 }
 
+fun AddressVersionGate.toAddressDto(): AddressVersionDto {
+
+    return AddressVersionDto(
+        this.characterSet,
+        this.language
+    )
+}
+
 //Legal Entities
 
 //fun LegalEntityGate.LegalEntityGateInputRequest(): LegalEntityGateInputRequest {
@@ -114,6 +144,28 @@ fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
 //        this.externalId,
 //    )
 //}
+
+// Site Mappers
+fun SiteGate.toSiteGateInputRequest(): SiteGateInputRequest {
+
+    return SiteGateInputRequest(
+        SiteDto(this.name, AddressDto()),
+        this.bpn,
+        this.legalEntityExternalId,
+        this.externalId
+    )
+}
+
+fun SiteGateInputRequest.toSiteGate(): SiteGate {
+
+    return SiteGate(
+        this.bpn.toString(),
+        this.site.name,
+        this.externalId,
+        this.legalEntityExternalId,
+        this.site.mainAddress.toAddressGateDto(),
+    )
+}
 
 
 
