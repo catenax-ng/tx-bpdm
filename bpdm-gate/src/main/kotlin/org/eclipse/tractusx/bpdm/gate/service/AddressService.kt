@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchRespons
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
@@ -31,8 +32,10 @@ import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.entity.AddressGate
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
+import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -43,7 +46,8 @@ class AddressService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val typeMatchingService: TypeMatchingService
+    private val typeMatchingService: TypeMatchingService,
+    private val gateAddressRepository: GateAddressRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -150,6 +154,12 @@ class AddressService(
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
+
+        addresses.forEach {
+            if(gateAddressRepository.findAllByExternalId(it.externalId).isEmpty() ) {
+                gateAddressRepository.save(it.toAddressGate())
+            }
+        }
 
         deleteParentRelationsOfAddresses(addresses)
 

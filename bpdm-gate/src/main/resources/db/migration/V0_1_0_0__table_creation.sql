@@ -16,10 +16,10 @@ CREATE TABLE "bpdmgate".addresses (
 	character_set varchar(255) NOT NULL,
 	"language" varchar(255) NOT NULL,
 	CONSTRAINT pk_addresses PRIMARY KEY (id),
-	CONSTRAINT uc_addresses_bpn UNIQUE (bpn),
+-- 	CONSTRAINT uc_addresses_bpn UNIQUE (bpn),
 	CONSTRAINT uc_addresses_uuid UNIQUE (uuid),
-	CONSTRAINT uc_addresses_site_external_id UNIQUE (site_external_id),
-	CONSTRAINT uc_addresses_legal_entity_external_id UNIQUE (legal_entity_external_id),
+-- 	CONSTRAINT uc_addresses_site_external_id UNIQUE (site_external_id),
+-- 	CONSTRAINT uc_addresses_legal_entity_external_id UNIQUE (legal_entity_external_id),
 	CONSTRAINT uc_addresses_external_id UNIQUE (external_id)
 );
 
