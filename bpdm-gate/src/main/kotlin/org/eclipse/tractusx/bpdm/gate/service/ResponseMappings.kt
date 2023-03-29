@@ -20,30 +20,15 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.model.AddressType
-import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
-
 import org.springframework.data.domain.Page
 
 
 fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
-}
-
-fun AddressGate.toAddressGateInputRequest(): AddressGateInputRequest {
-
-    return AddressGateInputRequest(
-        AddressDto(),
-        this.externalId,
-        this.legalEntityExternalId,
-        this.siteExternalId,
-        this.bpn
-    )
 }
 
 fun AddressDto.toAddressGateDto(): AddressGate {
@@ -90,9 +75,33 @@ fun AddressGateInputRequest.toAddressGate(): AddressGate {
         this.externalId,
         this.legalEntityExternalId.toString(),
         this.siteExternalId.toString(),
-        this.bpn.toString()
+        this.bpn.toString(),
     )
 
+}
+
+fun toEntity(dto: PostCodeDto, address: AddressGate): PostCodeGate {
+    return PostCodeGate(dto.value, dto.type, address)
+}
+
+fun toEntity(dto: AdministrativeAreaDto, address: AddressGate): AdministrativeAreaGate {
+    return AdministrativeAreaGate(dto.value, dto.shortName, dto.fipsCode, dto.type, address.version.language, address.country, address)
+}
+
+fun toEntity(dto: ThoroughfareDto, address: AddressGate): ThoroughfareGate {
+    return ThoroughfareGate(dto.value, dto.name, dto.shortName, dto.number, dto.direction, dto.type, address)
+}
+
+fun toEntity(dto: LocalityDto, address: AddressGate): LocalityGate {
+    return LocalityGate(dto.value, dto.shortName, dto.type, address)
+}
+
+fun toEntity(dto: PremiseDto, address: AddressGate): PremiseGate {
+    return PremiseGate(dto.value, dto.shortName, dto.number, dto.type, address)
+}
+
+fun toEntity(dto: PostalDeliveryPointDto, address: AddressGate): PostalDeliveryPointGate {
+    return PostalDeliveryPointGate(dto.value, dto.shortName, dto.number, dto.type, address)
 }
 
 fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
@@ -121,29 +130,6 @@ fun AddressVersionGate.toAddressDto(): AddressVersionDto {
         this.language
     )
 }
-
-//Legal Entities
-
-//fun LegalEntityGate.LegalEntityGateInputRequest(): LegalEntityGateInputRequest {
-//
-//    return LegalEntityGateInputRequest(
-//        LegalEntityDto(),
-//        this.externalId,
-//        this.bpn,
-//    )
-//
-//}
-//
-//fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate {
-//
-//    return LegalEntityGate(
-//        this.bpn.toString(),
-//        this.legalEntity.legalForm,
-//        this.legalEntity.types,
-//        this.legalEntity,
-//        this.externalId,
-//    )
-//}
 
 // Site Mappers
 fun SiteGate.toSiteGateInputRequest(): SiteGateInputRequest {

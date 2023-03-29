@@ -32,7 +32,7 @@ abstract class BaseEntity(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bpdm_sequence")
     @SequenceGenerator(name = "bpdm_sequence", sequenceName = "bpdm_sequence", allocationSize = 1)
     @Column(name = "id", nullable = false, updatable = false, insertable = false)
-    val id: Long = 0,
+    var id: Long = 0,
 
     @Column(name = "uuid", nullable = false, updatable = false, unique = true, columnDefinition = "uuid")
     val uuid: UUID = UUID.randomUUID(),

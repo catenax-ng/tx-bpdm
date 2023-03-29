@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchRespons
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
@@ -155,15 +154,42 @@ class AddressService(
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
 
-        addresses.forEach {
-            if(gateAddressRepository.findAllByExternalId(it.externalId).isEmpty() ) {
-                gateAddressRepository.save(it.toAddressGate())
+        //Business Partner persist
+        addresses.forEach { address ->
+            val fullAddress = createAddress(address.toAddressGate(), address)
+            val addressRecord = gateAddressRepository.findByExternalId(address.externalId)
+            if (addressRecord != null) {
+                fullAddress.id = addressRecord.id
             }
+            gateAddressRepository.save(fullAddress)
         }
 
         deleteParentRelationsOfAddresses(addresses)
 
         upsertParentRelations(addresses)
+    }
+
+    private fun createAddress(address: AddressGate, addressRequest: AddressGateInputRequest): AddressGate{
+
+        address.administrativeAreas.clear()
+        address.postCodes.clear()
+        address.thoroughfares.clear()
+        address.localities.clear()
+        address.premises.clear()
+        address.postalDeliveryPoints.clear()
+        address.contexts.clear()
+        address.types.clear()
+
+        address.postCodes.addAll(addressRequest.address.postCodes.map { toEntity(it, address) }.toSet())
+        address.administrativeAreas.addAll(addressRequest.address.administrativeAreas.map { toEntity(it, address) }.toSet())
+        address.thoroughfares.addAll(addressRequest.address.thoroughfares.map { toEntity(it, address) }.toSet())
+        address.localities.addAll(addressRequest.address.localities.map { toEntity(it, address) }.toSet())
+        address.premises.addAll(addressRequest.address.premises.map { toEntity(it, address) }.toSet())
+        address.postalDeliveryPoints.addAll(addressRequest.address.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
+        address.contexts.addAll(addressRequest.address.contexts)
+        address.types.addAll(addressRequest.address.types)
+
+        return address
     }
 
     /**
