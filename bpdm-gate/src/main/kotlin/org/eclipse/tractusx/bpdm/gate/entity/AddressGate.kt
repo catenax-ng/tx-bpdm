@@ -38,7 +38,7 @@ class AddressGate(
         indexes = [Index(columnList = "address_id")]
     )
     @Column(name = "context", nullable = false)
-    var contexts: MutableSet<String> = mutableSetOf(),
+    val contexts: MutableSet<String> = mutableSetOf(),
     @Column(name = "country", nullable = false)
     @Enumerated(EnumType.STRING)
     var country: CountryCode,
@@ -50,7 +50,7 @@ class AddressGate(
         indexes = [Index(columnList = "address_id")]
     )
     @Column(name = "type", nullable = false)
-    var types: MutableSet<AddressType> = mutableSetOf(),
+    val types: MutableSet<AddressType> = mutableSetOf(),
     @Embedded
     var version: AddressVersionGate,
     @Embedded

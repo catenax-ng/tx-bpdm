@@ -123,14 +123,6 @@ fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
 
 }
 
-fun AddressVersionGate.toAddressDto(): AddressVersionDto {
-
-    return AddressVersionDto(
-        this.characterSet,
-        this.language
-    )
-}
-
 // Site Mappers
 fun SiteGate.toSiteGateInputRequest(): SiteGateInputRequest {
 
