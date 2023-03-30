@@ -22,9 +22,12 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 
 fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
@@ -65,7 +68,7 @@ fun AddressGateInputRequest.toAddressGate(): AddressGate {
         ).toGeographicCoordinateGate()
     }
 
-    return AddressGate(
+    val address = AddressGate(
         this.address.careOf,
         this.address.contexts.toMutableSet(),
         this.address.country,
@@ -77,7 +80,15 @@ fun AddressGateInputRequest.toAddressGate(): AddressGate {
         this.siteExternalId.toString(),
         this.bpn.toString(),
     )
-
+    address.postCodes.replace(this.address.postCodes.map { toEntity(it, address) }.toSet())
+    address.administrativeAreas.replace(this.address.administrativeAreas.map { toEntity(it, address) }.toSet())
+    address.thoroughfares.replace(this.address.thoroughfares.map { toEntity(it, address) }.toSet())
+    address.localities.replace(this.address.localities.map { toEntity(it, address) }.toSet())
+    address.premises.replace(this.address.premises.map { toEntity(it, address) }.toSet())
+    address.postalDeliveryPoints.replace(this.address.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
+    address.contexts.replace(this.address.contexts)
+    address.types.replace(this.address.types)
+    return address
 }
 
 fun toEntity(dto: PostCodeDto, address: AddressGate): PostCodeGate {
@@ -113,7 +124,10 @@ fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
     )
 
 }
-
+fun <T> MutableCollection<T>.replace (elements : Collection<T>) {
+    clear()
+    addAll(elements)
+}
 fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
 
     return AddressVersionGate(
@@ -144,6 +158,24 @@ fun SiteGateInputRequest.toSiteGate(): SiteGate {
         this.site.mainAddress.toAddressGateDto(),
     )
 }
+
+fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate{
+
+    return LegalEntityGate(
+        bpn= bpn.toString(),
+        legalEntity.legalForm.toString(),
+        currentness = createCurrentnessTimestamp(),
+        externalId = externalId.toString(),
+        types = legalEntity.types.toMutableSet(),
+        legalAddress = legalEntity.legalAddress.toAddressGateDto(),
+        roles = mutableSetOf()
+    )
+
+}
+private fun createCurrentnessTimestamp(): Instant {
+    return Instant.now().truncatedTo(ChronoUnit.MICROS)
+}
+
 
 
 
