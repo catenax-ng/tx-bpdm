@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.gate.entity.AddressGate
+import org.eclipse.tractusx.bpdm.gate.entity.SiteGate
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.CrudRepository
 
-interface GateAddressRepository : JpaRepository<AddressGate, Long>, CrudRepository<AddressGate, Long> {
+interface GateSiteRepository : JpaRepository<SiteGate, Long>, CrudRepository<SiteGate, Long> {
 
-    fun findByExternalId(externalIds: String): AddressGate?
+    fun findByExternalIdIn(externalId: Collection<String>): Set<SiteGate>
 
 }
