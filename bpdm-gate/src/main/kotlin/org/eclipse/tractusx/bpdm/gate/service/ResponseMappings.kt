@@ -24,26 +24,17 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.dto.AddressVersionDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
-import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 
-fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
-    return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
-}
-
 fun AddressDto.toAddressGateDto(): AddressGate {
-
-    val geoCoords = this.geographicCoordinates?.let {
-        GeoCoordinateDto(
-            it.longitude,
-            it.latitude,
-            it.altitude
-        ).toGeographicCoordinateGate()
-    }
 
     return AddressGate(
         this.careOf,
@@ -51,7 +42,7 @@ fun AddressDto.toAddressGateDto(): AddressGate {
         this.country,
         this.types.toMutableSet(),
         this.version.toAddressVersionGate(),
-        geoCoords,
+        this.geographicCoordinates?.toGeographicCoordinateGate(),
         "",
         "",
         "",
@@ -91,7 +82,10 @@ fun AddressGateInputRequest.toAddressGate(): AddressGate {
     address.types.replace(this.address.types)
     return address
 }
-
+fun <T> MutableCollection<T>.replace (elements : Collection<T>) {
+    clear()
+    addAll(elements)
+}
 fun toEntity(dto: PostCodeDto, address: AddressGate): PostCodeGate {
     return PostCodeGate(dto.value, dto.type, address)
 }
@@ -141,10 +135,7 @@ fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
     )
 
 }
-fun <T> MutableCollection<T>.replace (elements : Collection<T>) {
-    clear()
-    addAll(elements)
-}
+
 fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
 
     return AddressVersionGate(
