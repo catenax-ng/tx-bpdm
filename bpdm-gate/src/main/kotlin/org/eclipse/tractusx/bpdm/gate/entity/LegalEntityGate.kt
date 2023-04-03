@@ -26,14 +26,12 @@ import java.time.Instant
 
 @Entity
 @Table(
-    name = "legal_entities",
-    indexes = [Index(columnList = "legal_form_id")]
+    name = "legal_entities"
 )
 class LegalEntityGate(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
-    @ManyToOne
-    @JoinColumn(name = "legal_form_id")
+    @Column(name = "legal_form", nullable = false, unique = false)
     var legalForm: String,
     @ElementCollection(targetClass = BusinessPartnerType::class)
     @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])

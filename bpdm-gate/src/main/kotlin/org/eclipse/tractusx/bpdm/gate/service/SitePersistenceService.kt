@@ -27,25 +27,25 @@ import org.springframework.stereotype.Service
 @Service
 class SitePersistenceService(private val gateSiteRepository: GateSiteRepository) {
 
-    fun persistAddressBP(sites: Collection<SiteGateInputRequest>) {
+    fun persistSitesBP(sites: Collection<SiteGateInputRequest>) {
 
         val externalIdColl: MutableCollection<String> = mutableListOf()
         sites.forEach { externalIdColl.add(it.externalId) }
 
-        val addressRecord = gateSiteRepository.findByExternalIdIn(externalIdColl)
+        val siteRecord = gateSiteRepository.findByExternalIdIn(externalIdColl)
 
         sites.forEach { site ->
-            val fullAddress = site.toSiteGate()
-            addressRecord.find { it.externalId == site.externalId }?.let { existingAddress ->
-                updateAddress(existingAddress, site)
-                gateSiteRepository.save(existingAddress)
+            val fullSite = site.toSiteGate()
+            siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
+                updateSite(existingSite, site)
+                gateSiteRepository.save(existingSite)
             } ?: run {
-                gateSiteRepository.save(fullAddress)
+                gateSiteRepository.save(fullSite)
             }
         }
     }
 
-    private fun updateAddress(site: SiteGate, sitesRequest: SiteGateInputRequest) {
+    private fun updateSite(site: SiteGate, sitesRequest: SiteGateInputRequest) {
 
         site.bpn = sitesRequest.bpn.toString()
         site.name = sitesRequest.site.name

@@ -19,15 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
-import org.eclipse.tractusx.bpdm.common.dto.AddressVersionDto
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import java.time.Instant
@@ -163,6 +158,15 @@ fun SiteGateInputRequest.toSiteGate(): SiteGate {
         this.site.name,
         this.externalId,
         this.legalEntityExternalId,
+        LegalEntityGate(
+            bpn = "ABC123",
+            "",
+            types = mutableSetOf(BusinessPartnerType.BRAND, BusinessPartnerType.LEGAL_ENTITY),
+            roles = mutableSetOf(RoleGate(name = "Admin", technicalKey = "")),
+            currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
+            this.site.mainAddress.toAddressGateDto(),
+            externalId = this.legalEntityExternalId,
+        ),
         this.site.mainAddress.toAddressGateDto(),
     )
 }

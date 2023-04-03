@@ -52,23 +52,6 @@ CREATE TABLE legal_form_categories
      CONSTRAINT uc_legal_form_categories_uuid UNIQUE (uuid)
   );
 
-
-CREATE TABLE legal_forms
-  (
-     id            INT8 NOT NULL,
-     created_at    TIMESTAMP WITH time zone NOT NULL,
-     updated_at    TIMESTAMP WITH time zone NOT NULL,
-     uuid          UUID NOT NULL,
-     "language"    INT2 NOT NULL,
-     abbreviation  VARCHAR(255) NULL,
-     "name"        VARCHAR(255) NULL,
-     technical_key VARCHAR(255) NOT NULL,
-     url           VARCHAR(255) NULL,
-     CONSTRAINT pk_legal_forms PRIMARY KEY (id),
-     CONSTRAINT uc_legal_forms_uuid UNIQUE (uuid)
-  );
-
-
 CREATE TABLE roles
   (
      id            INT8 NOT NULL,
@@ -82,14 +65,6 @@ CREATE TABLE roles
      CONSTRAINT uc_roles_technical_key UNIQUE (technical_key)
   );
 
-
-
-
-
-
-
-
-
 CREATE TABLE legal_entities
   (
      id               INT8 NOT NULL,
@@ -100,17 +75,13 @@ CREATE TABLE legal_entities
      currentness      TIMESTAMP WITH time zone NOT NULL,
      external_id      VARCHAR(255) NOT NULL,
      legal_address_id INT8 NOT NULL,
-     legal_form_id    INT8 NULL,
+     legal_form       VARCHAR(255) NOT NULL,
      CONSTRAINT pk_legal_entities PRIMARY KEY (id),
      CONSTRAINT uc_legal_entities UNIQUE (external_id),
      CONSTRAINT uc_legal_entities_uuid UNIQUE (uuid),
      CONSTRAINT uc_legal_entities_bpn UNIQUE (bpn),
-     CONSTRAINT fk_legal_entities_on_address FOREIGN KEY (legal_address_id)
-     REFERENCES addresses(id),
-     CONSTRAINT fk_legal_entities_on_legal_forms FOREIGN KEY (legal_form_id)
-     REFERENCES legal_forms(id)
+     CONSTRAINT fk_legal_entities_on_address FOREIGN KEY (legal_address_id) REFERENCES addresses(id)
   );
-CREATE INDEX idx_m9ojfna20safop6xndvj1510n ON legal_entities USING btree (legal_form_id);
 
 CREATE TABLE legal_entity_roles
   (
@@ -220,7 +191,7 @@ CREATE TABLE sites
      external_id              VARCHAR(255) NOT NULL,
      legal_entity_external_id VARCHAR(255) NULL,
      "name"                   VARCHAR(255) NOT NULL,
---      legal_entity_id          INT8 NOT NULL,
+     legal_entity_id          INT8 NOT NULL,
      main_address_id          INT8 NOT NULL,
      CONSTRAINT pk_site PRIMARY KEY (id)
   );
@@ -240,8 +211,8 @@ ALTER TABLE sites
 ALTER TABLE sites
     ADD CONSTRAINT FK_SITES_ON_MAIN_ADDRESS FOREIGN KEY (main_address_id) REFERENCES addresses (id);
 
--- ALTER TABLE sites
---     ADD CONSTRAINT FK_SITES_ON_LEGAL_ENTITY FOREIGN KEY (legal_entity_id) REFERENCES legal_entities (id);
+ALTER TABLE sites
+    ADD CONSTRAINT FK_SITES_ON_LEGAL_ENTITY FOREIGN KEY (legal_entity_id) REFERENCES legal_entities (id);
 
 
 
