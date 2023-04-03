@@ -34,7 +34,7 @@ class LegalEntityGate(
     var bpn: String,
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
-    var legalForm: LegalFormGate?,
+    var legalForm: String,
     @ElementCollection(targetClass = BusinessPartnerType::class)
     @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])
     @Column(name = "type", nullable = false)

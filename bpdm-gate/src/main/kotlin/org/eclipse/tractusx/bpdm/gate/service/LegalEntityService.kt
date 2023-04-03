@@ -31,6 +31,8 @@ import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntityGate
+import org.eclipse.tractusx.bpdm.gate.repository.GateLegalEntityRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -40,6 +42,7 @@ class LegalEntityService(
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
+    private val gateLegalEntityRepository: GateLegalEntityRepository,
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -47,8 +50,19 @@ class LegalEntityService(
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
         val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
         saasClient.upsertLegalEntities(legalEntitiesSaas)
-    }
 
+        val legalEntityRecord = gateLegalEntityRepository.findAll()
+        //Business Partner persist
+        legalEntities.forEach { legalEntity ->
+            val fullLegalEntity = legalEntity.toLegalEntityGate()
+            legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
+                gateLegalEntityRepository.save(updateLegalEntity(existingLegalEntity, legalEntity))
+            } ?: run {
+                gateLegalEntityRepository.save(fullLegalEntity)
+            }
+
+        }
+    }
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
         val fetchResponse = saasClient.getBusinessPartner(externalId)
 
@@ -143,5 +157,19 @@ class LegalEntityService(
                 null
             }
         }
+    }
+
+    private fun updateLegalEntity(legalEntity: LegalEntityGate, legalEntityRequest: LegalEntityGateInputRequest): LegalEntityGate {
+
+        legalEntity.bpn = legalEntityRequest.bpn.toString();
+        legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm.toString();
+        legalEntity.types = legalEntityRequest.legalEntity.types.toMutableSet();
+        legalEntity.legalAddress = legalEntityRequest.legalEntity.legalAddress.toAddressGateDto()
+        legalEntity.externalId = legalEntityRequest.externalId
+        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntity(it,legalEntity) });
+        legalEntity.nameGates.replace(legalEntityRequest.legalEntity.names.map {toEntity(it, legalEntity)}.toSet());
+        legalEntity.bankAccounts.replace(legalEntityRequest.legalEntity.bankAccounts.map { toEntity(it,legalEntity) }.toSet())
+        legalEntity.classification.replace(legalEntityRequest.legalEntity.profileClassifications.map { toEntity(it, legalEntity) }.toSet())
+        return legalEntity;
     }
 }

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
@@ -115,6 +116,22 @@ fun toEntity(dto: PostalDeliveryPointDto, address: AddressGate): PostalDeliveryP
     return PostalDeliveryPointGate(dto.value, dto.shortName, dto.number, dto.type, address)
 }
 
+fun toEntity(dto: IdentifierDto,legalEntityGate: LegalEntityGate): IdentifierGate {
+    return IdentifierGate(dto.value, IdentifierTypeGate(dto.type,"","") ,
+        IdentifierStatusGate(dto.status.toString(),"") ,
+        IssuingBodyGate(dto.issuingBody.toString(),"","") ,  legalEntityGate)
+}
+fun toEntity(dto: NameDto,legalEntityGate: LegalEntityGate): NameGate {
+    return NameGate(dto.value,dto.shortName,dto.type,dto.language,legalEntityGate)
+}
+fun toEntity(dto: BankAccountDto,legalEntityGate: LegalEntityGate): BankAccountGate {
+    return BankAccountGate(dto.trustScores.toMutableSet(), currency = dto.currency,
+     dto.nationalBankAccountIdentifier.toString(),dto.internationalBankIdentifier.toString(),
+        dto.nationalBankAccountIdentifier.toString(),dto.nationalBankIdentifier.toString(),legalEntityGate)
+}
+fun toEntity(dto: ClassificationDto,legalEntityGate: LegalEntityGate): ClassificationGate {
+    return ClassificationGate(dto.value,dto.code,dto.type,legalEntityGate)
+}
 fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
 
     return GeographicCoordinateGate(
@@ -161,7 +178,7 @@ fun SiteGateInputRequest.toSiteGate(): SiteGate {
 
 fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate{
 
-    return LegalEntityGate(
+    val legalEntityGate = LegalEntityGate(
         bpn= bpn.toString(),
         legalEntity.legalForm.toString(),
         currentness = createCurrentnessTimestamp(),
@@ -171,6 +188,11 @@ fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate{
         roles = mutableSetOf()
     )
 
+    legalEntityGate.identifiers.replace(this.legalEntity.identifiers.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.nameGates.replace(this.legalEntity.names.map {toEntity(it, legalEntityGate)}.toSet())
+    legalEntityGate.bankAccounts.replace(this.legalEntity.bankAccounts.map { toEntity(it,legalEntityGate) }.toSet())
+    legalEntityGate.classification.replace(this.legalEntity.profileClassifications.map { toEntity(it, legalEntityGate) }.toSet())
+    return legalEntityGate;
 }
 private fun createCurrentnessTimestamp(): Instant {
     return Instant.now().truncatedTo(ChronoUnit.MICROS)
