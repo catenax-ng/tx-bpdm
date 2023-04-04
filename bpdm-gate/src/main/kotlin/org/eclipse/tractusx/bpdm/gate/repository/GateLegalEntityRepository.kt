@@ -25,5 +25,6 @@ import org.springframework.data.repository.CrudRepository
 
 interface GateLegalEntityRepository : JpaRepository<LegalEntityGate, Long>, CrudRepository<LegalEntityGate, Long> {
 
+    fun findDistinctByBpnIn(externalId: Collection<String>): Set<LegalEntityGate>
 
 }

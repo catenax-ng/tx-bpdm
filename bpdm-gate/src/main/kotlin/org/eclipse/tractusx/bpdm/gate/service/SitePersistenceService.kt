@@ -21,29 +21,43 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.SiteGate
+import org.eclipse.tractusx.bpdm.gate.repository.GateLegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateSiteRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-class SitePersistenceService(private val gateSiteRepository: GateSiteRepository) {
+class SitePersistenceService(
+    private val gateSiteRepository: GateSiteRepository,
+    private val gateLegalEntityRepository: GateLegalEntityRepository
+) {
 
+    @Transactional
     fun persistSitesBP(sites: Collection<SiteGateInputRequest>) {
 
+        //finds Legal Entity by External ID
+        val legalEntities = gateLegalEntityRepository.findDistinctByBpnIn(sites.map { it.legalEntityExternalId })
+
+        //Finds Site in DB
         val externalIdColl: MutableCollection<String> = mutableListOf()
         sites.forEach { externalIdColl.add(it.externalId) }
-
         val siteRecord = gateSiteRepository.findByExternalIdIn(externalIdColl)
 
-        sites.forEach { site ->
-            val fullSite = site.toSiteGate()
-            siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
-                updateSite(existingSite, site)
-                gateSiteRepository.save(existingSite)
-            } ?: run {
-                gateSiteRepository.save(fullSite)
+        for (legalEntity in legalEntities) {
+            sites.forEach { site ->
+                if (legalEntity.bpn == site.legalEntityExternalId) {
+                    val fullSite = site.toSiteGate(legalEntity)
+                    siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
+                        updateSite(existingSite, site)
+                        gateSiteRepository.save(existingSite)
+                    } ?: run {
+                        gateSiteRepository.save(fullSite)
+                    }
+                }
             }
         }
     }
+
 
     private fun updateSite(site: SiteGate, sitesRequest: SiteGateInputRequest) {
 

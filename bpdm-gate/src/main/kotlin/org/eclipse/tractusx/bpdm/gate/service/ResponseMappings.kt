@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
@@ -47,40 +46,29 @@ fun AddressDto.toAddressGateDto(): AddressGate {
 
 fun AddressGateInputRequest.toAddressGate(): AddressGate {
 
-    val geoCoords = this.address.geographicCoordinates?.let {
-        GeoCoordinateDto(
-            it.longitude,
-            it.latitude,
-            it.altitude
-        ).toGeographicCoordinateGate()
-    }
-
     val address = AddressGate(
-        this.address.careOf,
-        this.address.contexts.toMutableSet(),
-        this.address.country,
-        this.address.types.toMutableSet(),
-        this.address.version.toAddressVersionGate(),
-        geoCoords,
-        this.externalId,
-        this.legalEntityExternalId.toString(),
-        this.siteExternalId.toString(),
-        this.bpn.toString(),
+        careOf = address.careOf,
+        country = address.country,
+        version = address.version.toAddressVersionGate(),
+        geoCoordinates = address.geographicCoordinates?.toGeographicCoordinateGate(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntityExternalId.toString(),
+        siteExternalId = siteExternalId.toString(),
+        bpn = bpn.toString(),
     )
-    address.postCodes.replace(this.address.postCodes.map { toEntity(it, address) }.toSet())
-    address.administrativeAreas.replace(this.address.administrativeAreas.map { toEntity(it, address) }.toSet())
-    address.thoroughfares.replace(this.address.thoroughfares.map { toEntity(it, address) }.toSet())
-    address.localities.replace(this.address.localities.map { toEntity(it, address) }.toSet())
-    address.premises.replace(this.address.premises.map { toEntity(it, address) }.toSet())
-    address.postalDeliveryPoints.replace(this.address.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
-    address.contexts.replace(this.address.contexts)
-    address.types.replace(this.address.types)
+
+    address.postCodes.addAll(this.address.postCodes.map { toEntity(it, address) }.toSet())
+    address.administrativeAreas.addAll(this.address.administrativeAreas.map { toEntity(it, address) }.toSet())
+    address.thoroughfares.addAll(this.address.thoroughfares.map { toEntity(it, address) }.toSet())
+    address.localities.addAll(this.address.localities.map { toEntity(it, address) }.toSet())
+    address.premises.addAll(this.address.premises.map { toEntity(it, address) }.toSet())
+    address.postalDeliveryPoints.addAll(this.address.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
+    address.contexts.addAll(this.address.contexts)
+    address.types.addAll(this.address.types)
+
     return address
 }
-fun <T> MutableCollection<T>.replace (elements : Collection<T>) {
-    clear()
-    addAll(elements)
-}
+
 fun toEntity(dto: PostCodeDto, address: AddressGate): PostCodeGate {
     return PostCodeGate(dto.value, dto.type, address)
 }
@@ -105,22 +93,6 @@ fun toEntity(dto: PostalDeliveryPointDto, address: AddressGate): PostalDeliveryP
     return PostalDeliveryPointGate(dto.value, dto.shortName, dto.number, dto.type, address)
 }
 
-fun toEntity(dto: IdentifierDto,legalEntityGate: LegalEntityGate): IdentifierGate {
-    return IdentifierGate(dto.value, IdentifierTypeGate(dto.type,"","") ,
-        IdentifierStatusGate(dto.status.toString(),"") ,
-        IssuingBodyGate(dto.issuingBody.toString(),"","") ,  legalEntityGate)
-}
-fun toEntity(dto: NameDto,legalEntityGate: LegalEntityGate): NameGate {
-    return NameGate(dto.value,dto.shortName,dto.type,dto.language,legalEntityGate)
-}
-fun toEntity(dto: BankAccountDto,legalEntityGate: LegalEntityGate): BankAccountGate {
-    return BankAccountGate(dto.trustScores.toMutableSet(), currency = dto.currency,
-     dto.nationalBankAccountIdentifier.toString(),dto.internationalBankIdentifier.toString(),
-        dto.nationalBankAccountIdentifier.toString(),dto.nationalBankIdentifier.toString(),legalEntityGate)
-}
-fun toEntity(dto: ClassificationDto,legalEntityGate: LegalEntityGate): ClassificationGate {
-    return ClassificationGate(dto.value,dto.code,dto.type,legalEntityGate)
-}
 fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
 
     return GeographicCoordinateGate(
@@ -141,41 +113,24 @@ fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
 }
 
 // Site Mappers
-fun SiteGate.toSiteGateInputRequest(): SiteGateInputRequest {
-
-    return SiteGateInputRequest(
-        SiteDto(this.name, AddressDto()),
-        this.bpn,
-        this.legalEntityExternalId,
-        this.externalId
-    )
-}
-
-fun SiteGateInputRequest.toSiteGate(): SiteGate {
+fun SiteGateInputRequest.toSiteGate(legalEntities: LegalEntityGate): SiteGate {
 
     return SiteGate(
         this.bpn.toString(),
         this.site.name,
         this.externalId,
         this.legalEntityExternalId,
-        LegalEntityGate(
-            bpn = "ABC123",
-            "",
-            types = mutableSetOf(BusinessPartnerType.BRAND, BusinessPartnerType.LEGAL_ENTITY),
-            roles = mutableSetOf(RoleGate(name = "Admin", technicalKey = "")),
-            currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-            this.site.mainAddress.toAddressGateDto(),
-            externalId = this.legalEntityExternalId,
-        ),
+        legalEntities,
         this.site.mainAddress.toAddressGateDto(),
     )
 }
 
+//Legal Entity
 fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate{
 
     val legalEntityGate = LegalEntityGate(
-        bpn= bpn.toString(),
-        legalEntity.legalForm.toString(),
+        bpn = bpn.toString(),
+        legalForm = legalEntity.legalForm.toString(),
         currentness = createCurrentnessTimestamp(),
         externalId = externalId.toString(),
         types = legalEntity.types.toMutableSet(),
@@ -183,14 +138,39 @@ fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate{
         roles = mutableSetOf()
     )
 
-    legalEntityGate.identifiers.replace(this.legalEntity.identifiers.map { toEntity(it, legalEntityGate) }.toSet())
-    legalEntityGate.nameGates.replace(this.legalEntity.names.map {toEntity(it, legalEntityGate)}.toSet())
-    legalEntityGate.bankAccounts.replace(this.legalEntity.bankAccounts.map { toEntity(it,legalEntityGate) }.toSet())
-    legalEntityGate.classification.replace(this.legalEntity.profileClassifications.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.identifiers.addAll(this.legalEntity.identifiers.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.nameGates.addAll(this.legalEntity.names.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.bankAccounts.addAll(this.legalEntity.bankAccounts.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.classification.addAll(this.legalEntity.profileClassifications.map { toEntity(it, legalEntityGate) }.toSet())
     return legalEntityGate;
 }
+
 private fun createCurrentnessTimestamp(): Instant {
     return Instant.now().truncatedTo(ChronoUnit.MICROS)
+}
+
+fun toEntity(dto: IdentifierDto, legalEntityGate: LegalEntityGate): IdentifierGate {
+    return IdentifierGate(
+        dto.value, IdentifierTypeGate(dto.type, "", ""),
+        IdentifierStatusGate(dto.status.toString(), ""),
+        IssuingBodyGate(dto.issuingBody.toString(), "", ""), legalEntityGate
+    )
+}
+
+fun toEntity(dto: NameDto, legalEntityGate: LegalEntityGate): NameGate {
+    return NameGate(dto.value, dto.shortName, dto.type, dto.language, legalEntityGate)
+}
+
+fun toEntity(dto: BankAccountDto, legalEntityGate: LegalEntityGate): BankAccountGate {
+    return BankAccountGate(
+        dto.trustScores.toMutableSet(), currency = dto.currency,
+        dto.nationalBankAccountIdentifier.toString(), dto.internationalBankIdentifier.toString(),
+        dto.nationalBankAccountIdentifier.toString(), dto.nationalBankIdentifier.toString(), legalEntityGate
+    )
+}
+
+fun toEntity(dto: ClassificationDto, legalEntityGate: LegalEntityGate): ClassificationGate {
+    return ClassificationGate(dto.value, dto.code, dto.type, legalEntityGate)
 }
 
 
