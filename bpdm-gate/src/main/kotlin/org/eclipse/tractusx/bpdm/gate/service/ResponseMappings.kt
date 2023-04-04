@@ -139,9 +139,10 @@ fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate{
     )
 
     legalEntityGate.identifiers.addAll(this.legalEntity.identifiers.map { toEntity(it, legalEntityGate) }.toSet())
-    legalEntityGate.nameGates.addAll(this.legalEntity.names.map { toEntity(it, legalEntityGate) }.toSet())
-    legalEntityGate.bankAccounts.addAll(this.legalEntity.bankAccounts.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.nameGates.addAll(this.legalEntity.names.map {toEntity(it, legalEntityGate)}.toSet())
+    legalEntityGate.bankAccounts.addAll(this.legalEntity.bankAccounts.map { toEntity(it,legalEntityGate) }.toSet())
     legalEntityGate.classification.addAll(this.legalEntity.profileClassifications.map { toEntity(it, legalEntityGate) }.toSet())
+    legalEntityGate.stati.addAll(if (this.legalEntity.status != null) setOf(toEntity(this.legalEntity.status!!, legalEntityGate)) else setOf())
     return legalEntityGate;
 }
 
@@ -173,6 +174,8 @@ fun toEntity(dto: ClassificationDto, legalEntityGate: LegalEntityGate): Classifi
     return ClassificationGate(dto.value, dto.code, dto.type, legalEntityGate)
 }
 
-
+private fun toEntity(dto: BusinessStatusDto, partner: LegalEntityGate): BusinessStatusGate {
+    return BusinessStatusGate(dto.officialDenotation, dto.validFrom, dto.validUntil, dto.type, partner)
+}
 
 
