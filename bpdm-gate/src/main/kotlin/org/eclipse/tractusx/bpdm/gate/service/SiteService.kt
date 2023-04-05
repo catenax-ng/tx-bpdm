@@ -44,7 +44,6 @@ class SiteService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val sitePersistenceService: SitePersistenceService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -139,8 +138,6 @@ class SiteService(
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
         val sitesSaas = toSaasModels(sites)
         saasClient.upsertSites(sitesSaas)
-
-        sitePersistenceService.persistSitesBP(sites)
 
         deleteParentRelationsOfSites(sites)
 
