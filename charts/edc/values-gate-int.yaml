@@ -1,47 +1,94 @@
+opensearch:
+  enabled: false
+
 txdc:
-  dataplane:
+  install:
+    daps: false
+    postgresql: true
+    vault: false
+
+  participant:
+    id: "BPNL00000007D968"
+
+  controlplane:
+    internationalDataSpaces:
+      id: TXDC-GATE
+      description: Tractus-X Eclipse IDS Data Space Connector for GATE
+      title: ""
+      maintainer: ""
+      curator: ""
+      catalogId: TXDC-GATE-Catalog
+    endpoints:
+      # -- data management api, used by internal users, can be added to an ingress and must not be internet facing
+      management:
+        # -- authentication key, must be attached to each 'X-Api-Key' request header
+        authKey: <path:bpdm/data/dev/edc/gate#controlplane-auth>
+    ## Ingress declaration to expose the network service.
     ingresses:
+      ## Public / Internet facing Ingress
       - enabled: true
+        # -- The hostname to be used to precisely map incoming traffic onto the underlying network service
         hostname: "gate-edc.int.demo.catena-x.net"
+        className: "nginx"
+        # -- EDC endpoints exposed by this ingress resource
+        endpoints:
+          - management
+          - control
+          - protocol
+        # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
+        tls:
+          # -- Enables TLS on the ingress resource
+          enabled: true
+          # -- If present overwrites the default secret name
+          secretName: tls-secret
+    url:
+      # -- Explicitly declared url for reaching the ids api (e.g. if ingresses not used)
+      ids: ""
+
+  dataplane:
+    ## Ingress declaration to expose the network service.
+    ingresses:
+      ## Public / Internet facing Ingress
+      - enabled: true
+        # -- The hostname to be used to precisely map incoming traffic onto the underlying network service
+        hostname: "gate-edc.int.demo.catena-x.net"
+        # -- EDC endpoints exposed by this ingress resource
         endpoints:
           - public
+        # -- Defines the [ingress class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)  to use
         className: "nginx"
-        # -- Enables TLS on the ingress resource
+        # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
         tls:
+          # -- Enables TLS on the ingress resource
           enabled: true
+          # -- If present overwrites the default secret name
           secretName: tls-secret
-  controlplane:
-    endpoints:
-      data:
-        authKey: <path:bpdm/data/dev/edc/gate#controlplane-auth>
-    ingresses:
-      - enabled: true
-        hostname: "gate-edc.int.demo.catena-x.net"
-        endpoints:
-          - data
-          - ids
-        className: "nginx"
-        # -- Enables TLS on the ingress resource
-        tls:
-          enabled: true
-          secretName: tls-secret
-  daps:
-    clientId: 83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A
-  backendService:
-    httpProxyTokenReceiverUrl: "http://edc-gate-backend"
+    url:
+      # -- Explicitly declared url for reaching the public api (e.g. if ingresses not used)
+      public: ""
+
   postgresql:
     jdbcUrl: "jdbc:postgresql://edc-gate-postgres:5432/edc"
+    fullnameOverride: "edc-gate-postgres"
+    username: user
+    password: password
+
   vault:
     hashicorp:
+      url: "https://vault.demo.catena-x.net"
       token: <path:bpdm/data/dev/edc/gate#vault-token>
       paths:
-        secret: "/v1/bpdm"
+        secret: /v1/bpdm
     secretNames:
-      dapsPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
-      dapsPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY
       transferProxyTokenEncryptionAesKey: dev/edc/gate/DATA_ENCRYPTION_KEYS_ALIAS
       transferProxyTokenSignerPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
       transferProxyTokenSignerPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY
+      dapsPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
+      dapsPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY
 
-opensearch:
-  enabled: false
+  daps:
+    url: "https://daps1.int.demo.catena-x.net"
+    clientId: "83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A"
+  backendService:
+    httpProxyTokenReceiverUrl: "http://edc-gate-backend.int.demo.catena-x.net"
+
