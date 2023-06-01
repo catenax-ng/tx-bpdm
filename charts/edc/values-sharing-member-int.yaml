@@ -1,48 +1,3 @@
-txdc:
-  dataplane:
-    ingresses:
-      - enabled: true
-        hostname: "sharing-member-edc.int.demo.catena-x.net"
-        endpoints:
-          - public
-        className: "nginx"
-        # -- Enables TLS on the ingress resource
-        tls:
-          enabled: true
-          secretName: tls-secret
-  controlplane:
-    endpoints:
-      data:
-        authKey: <path:bpdm/data/dev/edc/sharing-member#controlplane-auth>
-    ingresses:
-      - enabled: true
-        hostname: "sharing-member-edc.int.demo.catena-x.net"
-        endpoints:
-          - data
-          - ids
-        className: "nginx"
-        # -- Enables TLS on the ingress resource
-        tls:
-          enabled: true
-          secretName: tls-secret
-  daps:
-    clientId: B6:FB:F8:24:80:DB:2E:CF:8B:B9:82:B2:20:28:B0:CC:28:BE:24:4B:keyid:B6:FB:F8:24:80:DB:2E:CF:8B:B9:82:B2:20:28:B0:CC:28:BE:24:4B
-  backendService:
-    httpProxyTokenReceiverUrl: "http://edc-sharing-member-backend"
-  postgresql:
-    jdbcUrl: "jdbc:postgresql://edc-sharing-member-postgres:5432/edc"
-  vault:
-    hashicorp:
-      token: <path:bpdm/data/dev/edc/sharing-member#vault-token>
-      paths:
-        secret: "/v1/bpdm"
-    secretNames:
-      dapsPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
-      dapsPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
-      transferProxyTokenEncryptionAesKey: dev/edc/sharing-member/DATA_ENCRYPTION_KEYS_ALIAS
-      transferProxyTokenSignerPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
-      transferProxyTokenSignerPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
-
 opensearch:
   ingress:
     enabled: true
@@ -57,3 +12,95 @@ opensearch:
           - edc-sharing-member-backend.int.demo.catena-x.net
   masterService: ""
   fullnameOverride: edc-sharing-member-backend
+
+txdc:
+  install:
+    daps: false
+    postgresql: true
+    vault: false
+
+  participant:
+    id: "BPNL00000003CUFH"
+
+  controlplane:
+    internationalDataSpaces:
+      id: TXDC-SHARING-MEMBER
+      description: Tractus-X Eclipse IDS Data Space Connector for Sharing Member
+      title: ""
+      maintainer: ""
+      curator: ""
+      catalogId: TXDC-SM-Catalog
+    endpoints:
+      # -- data management api, used by internal users, can be added to an ingress and must not be internet facing
+      management:
+        # -- authentication key, must be attached to each 'X-Api-Key' request header
+        authKey: <path:bpdm/data/dev/edc/sharing-member#controlplane-auth>
+    ## Ingress declaration to expose the network service.
+    ingresses:
+      ## Public / Internet facing Ingress
+      - enabled: true
+        # -- The hostname to be used to precisely map incoming traffic onto the underlying network service
+        hostname: "sharing-member-edc.int.demo.catena-x.net"
+        className: "nginx"
+        # -- EDC endpoints exposed by this ingress resource
+        endpoints:
+          - management
+          - control
+          - protocol
+        # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
+        tls:
+          # -- Enables TLS on the ingress resource
+          enabled: true
+          # -- If present overwrites the default secret name
+          secretName: tls-secret
+    url:
+      # -- Explicitly declared url for reaching the ids api (e.g. if ingresses not used)
+      ids: ""
+
+  dataplane:
+    ## Ingress declaration to expose the network service.
+    ingresses:
+      ## Public / Internet facing Ingress
+      - enabled: true
+        # -- The hostname to be used to precisely map incoming traffic onto the underlying network service
+        hostname: "sharing-member-edc.int.demo.catena-x.net"
+        # -- EDC endpoints exposed by this ingress resource
+        endpoints:
+          - public
+        # -- Defines the [ingress class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)  to use
+        className: "nginx"
+        # -- TLS [tls class](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) applied to the ingress resource
+        tls:
+          # -- Enables TLS on the ingress resource
+          enabled: true
+          # -- If present overwrites the default secret name
+          secretName: tls-secret
+    url:
+      # -- Explicitly declared url for reaching the public api (e.g. if ingresses not used)
+      public: ""
+
+  postgresql:
+    jdbcUrl: "jdbc:postgresql://edc-sharing-member-postgres:5432/edc"
+    fullnameOverride: "edc-sharing-member-postgres"
+    username: user
+    password: password
+
+  vault:
+    hashicorp:
+      url: "https://vault.demo.catena-x.net"
+      token: <path:bpdm/data/dev/edc/sharing-member#vault-token>
+      paths:
+        secret: /v1/bpdm
+    secretNames:
+      transferProxyTokenEncryptionAesKey: dev/edc/sharing-member/DATA_ENCRYPTION_KEYS_ALIAS
+      transferProxyTokenSignerPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
+      transferProxyTokenSignerPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
+      dapsPrivateKey: dev/edc/sharing-member/DAPS_PRIVATE_KEY
+      dapsPublicKey: dev/edc/sharing-member/DAPS_PUBLIC_KEY
+
+  daps:
+    url: "https://daps1.int.demo.catena-x.net"
+    clientId: "B6:FB:F8:24:80:DB:2E:CF:8B:B9:82:B2:20:28:B0:CC:28:BE:24:4B:keyid:B6:FB:F8:24:80:DB:2E:CF:8B:B9:82:B2:20:28:B0:CC:28:BE:24:4B"
+  backendService:
+    httpProxyTokenReceiverUrl: "http://edc-sharing-member-backend.int.demo.catena-x.net"
+

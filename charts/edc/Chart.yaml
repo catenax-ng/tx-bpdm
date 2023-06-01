@@ -9,11 +9,6 @@ dependencies:
     alias: txdc
     version: 0.4.1
     repository: https://eclipse-tractusx.github.io/charts/dev
-  - name: postgresql
-    version: 11.9.1
-    repository: https://charts.bitnami.com/bitnami
-    alias: postgres
-    condition: postgres.enabled
   - name: opensearch
     version: 2.4.0
     repository: https://opensearch-project.github.io/helm-charts/
