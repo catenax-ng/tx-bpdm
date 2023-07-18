@@ -45,6 +45,16 @@ txdc:
       # -- Explicitly declared url for reaching the ids api (e.g. if ingresses not used)
       ids: ""
 
+    ssi:
+      miw:
+        url: "https://managed-identity-wallets-new.int.demo.catena-x.net"
+        authorityId: "BPNL00000003CRHK"
+      oauth:
+        tokenurl: "https://centralidp.int.demo.catena-x.net/auth/realms/CX-Central/protocol/openid-connect/token"
+        client:
+          id: "sa233"
+          secretAlias: "dev/edc/gate/CLIENT_SECRET"
+
   dataplane:
     ## Ingress declaration to expose the network service.
     ingresses:
@@ -86,9 +96,5 @@ txdc:
       dapsPrivateKey: dev/edc/gate/DAPS_PRIVATE_KEY
       dapsPublicKey: dev/edc/gate/DAPS_PUBLIC_KEY
 
-  daps:
-    url: "https://daps1.int.demo.catena-x.net"
-    clientId: "83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A:keyid:83:15:CC:78:32:27:82:59:EE:90:02:16:04:8D:DC:81:BF:64:14:1A"
   backendService:
     httpProxyTokenReceiverUrl: "http://edc-gate-backend.int.demo.catena-x.net"
-
