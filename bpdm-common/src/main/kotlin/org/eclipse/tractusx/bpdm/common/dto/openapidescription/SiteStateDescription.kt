@@ -19,12 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-object CommonDescription {
-    const val createdAt = "The date when the data record has been created."
-    const val updatedAt = "The date when the data record has been last updated."
+object SiteStateDescription {
+    const val header = "A site state indicates if the site is active or inactive. This does not describe the relation " +
+            "between a sharing member and a business partner and whether they have active business, " +
+            "but it describes whether the site is still operating."
 
-    const val index = "User defined index to conveniently match this entry to the corresponding entry in the response."
-    const val score = "Relative quality score of the match. The higher the better."
-
-    const val entityWithErrorsWrapperHeader = "Holds information about successfully and failed entities after the creating/updating of several objects"
+    const val description = "The description from the original source indicating the state of the site."
+    const val validFrom = "The date from which the state is valid."
+    const val validTo = "The date until the state is valid."
+    const val type = "One of the state types: active, inactive."
 }
