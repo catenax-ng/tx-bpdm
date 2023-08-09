@@ -17,19 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
+object AddressIdentifierDescription {
+    const val header = "An address identifier (uniquely) identifies the address, such as the Global Location Number (GLN)."
 
-// TODO rename to LogisticAddressSearchRequest / adjust
-@Schema(description = "Contains keywords used for searching in address properties")
-data class AddressPartnerSearchRequest(
-
-    @field:Parameter(description = "Filter business partners by name")
-    var name: String? = null
-) {
-    companion object {
-        val EmptySearchRequest = AddressPartnerSearchRequest()
-    }
+    const val value = "The value of the identifier like \"0847976000005\"."
+    const val type = "The type of the identifier."
 }

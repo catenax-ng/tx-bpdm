@@ -17,19 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
+object AddressStateDescription {
+    const val header = "An address state indicates if the address is active or inactive. " +
+            "This does not describe the relation between a sharing member and a business partner and whether they have active " +
+            "business, but it describes whether the business partner is still operating at that address."
 
-// TODO rename to LogisticAddressSearchRequest / adjust
-@Schema(description = "Contains keywords used for searching in address properties")
-data class AddressPartnerSearchRequest(
-
-    @field:Parameter(description = "Filter business partners by name")
-    var name: String? = null
-) {
-    companion object {
-        val EmptySearchRequest = AddressPartnerSearchRequest()
-    }
+    const val description = "The description from the original source indicating the state of the address."
+    const val validFrom = "The date from which the state is valid."
+    const val validTo = "The date until the state is valid."
+    const val type = "One of the state types: active, inactive."
 }

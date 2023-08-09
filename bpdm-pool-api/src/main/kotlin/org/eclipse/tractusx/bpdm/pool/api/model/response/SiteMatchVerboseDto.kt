@@ -37,6 +37,7 @@ data class SiteMatchVerboseDto(
     @Schema(description = SiteDescription.mainAddress)
     val mainAddress: LogisticAddressVerboseDto,
 
+    // TODO OpenAPI description for complex field does not work!!
     @Schema(description = SiteDescription.site)
     val site: SiteVerboseDto,
 )

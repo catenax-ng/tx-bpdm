@@ -17,19 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.request
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
+object StreetDescription {
+    const val header = "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway"
 
-// TODO rename to LogisticAddressSearchRequest / adjust
-@Schema(description = "Contains keywords used for searching in address properties")
-data class AddressPartnerSearchRequest(
-
-    @field:Parameter(description = "Filter business partners by name")
-    var name: String? = null
-) {
-    companion object {
-        val EmptySearchRequest = AddressPartnerSearchRequest()
-    }
+    const val name = "The name of the street."
+    const val houseNumber = "The number representing the exact location of a building within the street."
+    const val milestone = "The number representing the exact location of an addressed object within a street without house numbers, such as within long roads."
+    const val direction = "The cardinal direction describing where the exit to the location of the addressed object on large highways / " +
+            "motorways is located, such as Highway 101 South."
 }

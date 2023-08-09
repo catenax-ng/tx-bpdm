@@ -30,6 +30,10 @@ object LogisticAddressDescription {
             "An address is owned by a legal entity. Thus, exactly one legal entity is assigned to an address. " +
             "An address can belong to a site. Thus, one or no site is assigned to an address. An address is " +
             "uniquely identified by the BPNA."
+    const val headerCreateRequest = "Request for creating new business partner record of type address. $header"
+    const val headerUpdateRequest = "Request for updating a business partner record of type address. $header"
+    const val headerCreateResponse = "Created business partner of type address. $header"
+    const val headerMatchResponse = "Match for a business partner record of type address. $header"
 
     const val bpna = "A BPNA represents and uniquely identifies an address, which can be the legal address of a legal entity, " +
             "and/or the main address of a site, or any additional address of a legal entity or site (such as different gates). " +
@@ -45,4 +49,7 @@ object LogisticAddressDescription {
     const val bpnSite = "The BPNS of the site the address belongs to."
     const val isMainAddress = "Indicates if the address is the main address to a site. " +
             "This is where typically the main entrance or the reception is located, or where the mail is delivered to."
+
+    const val bpnParent = "BPNL of the legal entity or BPNS of the site this address belongs to."
+    const val address = "Address information"
 }
