@@ -25,11 +25,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(
-    name = "AddressGateOutputChildRequest",
-    description = "DTO for setting the output address data with BPN."
-)
+@Schema(description = "DTO for setting the output address data with BPN.")
 data class AddressGateOutputChildRequest(
+
     @field:JsonUnwrapped
     val address: LogisticAddressGateDto,
 
