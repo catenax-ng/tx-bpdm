@@ -41,7 +41,7 @@ data class SiteGateOutputResponse(
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String,
 
-    @get:Schema(description = SiteDescription.externalIdParent)
+    @get:Schema(description = SiteDescription.legalEntityExternalId)
     val legalEntityExternalId: String,
 
     @get:Schema(description = SiteDescription.bpns)

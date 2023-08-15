@@ -42,7 +42,7 @@ data class SiteGateOutputRequest(
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String,
 
-    @get:Schema(description = SiteDescription.externalIdParent)
+    @get:Schema(description = SiteDescription.legalEntityExternalId)
     val legalEntityExternalId: String,
 
     // TODO rename to bpns
