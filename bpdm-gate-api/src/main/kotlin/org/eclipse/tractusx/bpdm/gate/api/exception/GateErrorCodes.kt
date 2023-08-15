@@ -25,7 +25,6 @@ package org.eclipse.tractusx.bpdm.gate.api.exception
  */
 interface ErrorCode
 
-@Schema(description = "BusinessPartnerSharingError")
 enum class BusinessPartnerSharingError : ErrorCode {
     SharingProcessError,
     SharingTimeout,
