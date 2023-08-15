@@ -17,26 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ChangelogDescription
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import java.time.Instant
+object ChangelogDescription {
+    const val header = "An entry of the changelog, which is created each time a business partner is modified and " +
+            "contains data about the change. The actual new state of the business partner is not included."
 
-@Schema(description = ChangelogDescription.header)
-data class ChangelogEntryVerboseDto(
-
-    @get:Schema(description = ChangelogDescription.bpn)
-    val bpn: String,
-
-    @get:Schema(description = ChangelogDescription.businessPartnerType)
-    val businessPartnerType: BusinessPartnerType,
-
-    @get:Schema(description = ChangelogDescription.timestamp)
-    val timestamp: Instant,
-
-    @get:Schema(description = ChangelogDescription.changelogType)
-    val changelogType: ChangelogType
-)
+    const val changelogType = "One of the actions for which the changelog entry was created: create, update."
+    const val timestamp = "The date and time when the changelog entry was created."
+    const val businessPartnerType = "One of the types of business partners for which the changelog entry was created: legal entity, site, address."
+    const val bpn = "The business partner number for which the changelog entry was created. Can be either a BPNL, BPNS or BPNA."
+}
