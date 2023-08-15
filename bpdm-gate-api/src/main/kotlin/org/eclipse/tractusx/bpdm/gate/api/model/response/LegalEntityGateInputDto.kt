@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
 // TODO rename to LegalEntityGateInputResponse
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = LegalEntityDescription.headerUpsertResponse)
+@Schema(description = LegalEntityDescription.header)
 data class LegalEntityGateInputDto(
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.legalNameParts))

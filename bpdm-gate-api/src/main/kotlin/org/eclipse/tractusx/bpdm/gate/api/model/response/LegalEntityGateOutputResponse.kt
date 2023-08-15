@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = LegalEntityDescription.headerUpsertResponse)
+@Schema(description = LegalEntityDescription.header)
 data class LegalEntityGateOutputResponse(
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.legalNameParts))
