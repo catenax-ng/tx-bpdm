@@ -23,7 +23,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>bpdm-orchestrator-api</artifactId>
-	<name>orchestrator-api</name>
+	<name>Business Partner Data Management Orchestrator Api</name>
 	<description>Business Partner Data Management Orchestrator Api</description>
 	<packaging>jar</packaging>
 
