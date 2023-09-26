@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "326ec7da-09af-411a-ae73-3612d9c592f7",
+    "_postman_id": "6930ca9a-a4cc-4f2b-9819-69406e4af7c7",
     "name": "BPDM Gate",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "26818013"
+    "_exporter_id": "26285948"
   },
   "item": [
     {
@@ -428,6 +428,70 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Generic Business Partner",
+          "item": [
+            {
+              "name": "Business Partners",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n    {\n        \"nameParts\": [\n            \"WESTERN_LATIN_STANDARD\"\n        ],\n        \"states\": [\n            {\n                \"description\": \"Baden-Wuerttemberg\",\n                \"validFrom\": \"2023-06-05T10:32:30.231Z\",\n                \"validTo\": \"2023-06-05T10:32:30.231Z\",\n                \"type\": \"ACTIVE\"\n            }\n        ],\n        \"identifiers\": [\n            {\n                \"value\": \"123456789\",\n                \"type\": \"CUSTOM_ADDRESS_ID\"\n            }\n        ],\n        \"physicalPostalAddress\": {\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"country\": \"DE\",\n            \"postalCode\": \"70327\",\n            \"city\": \"Stuttgart\",\n            \"street\": {\n                \"namePrefix\": \"test prefix\",\n                \"additionalNamePrefix\": \"test\",\n                \"name\": \"Untertuerckheim Strasse 1\",\n                \"additionalNameSuffix\": \"test suffix\",\n                \"houseNumber\": \"1234\",\n                \"milestone\": \"Untertuerckheim Strasse 1\",\n                \"direction\": \"Untertuerckheim Strasse 1\",\n                \"nameSuffix\": \"test1 suffix\"\n            },\n            \"administrativeAreaLevel1\": \"Baden-Wuerttember\",\n            \"district\": \"Stuttgart\",\n            \"companyPostalCode\": \"71034\",\n            \"industrialZone\": \"Sindelfinden\",\n            \"building\": \"Building A\",\n            \"floor\": \"A\",\n            \"door\": \"1\"\n        },\n        \"alternativePostalAddress\": {\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"country\": \"DE\",\n            \"postalCode\": \"1234\",\n            \"city\": \"Stuttgart\",\n            \"administrativeAreaLevel1\": \"Stuttgart\",\n            \"deliveryServiceNumber\": \"Untertuerckheim Strasse 1\",\n            \"deliveryServiceType\": \"PO_BOX\",\n            \"deliveryServiceQualifier\": \"test qualifier\"\n        },\n        \"roles\": [\n            \"SUPPLIER\"\n        ],\n        \"externalId\": \"12044444_legalAddress\",\n        \"legalEntityExternalId\": \"12044444\",\n        \"siteExternalId\": null,\n        \"bpn\": \"BPNA000000000001\"\n    }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/addresses",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "addresses"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Business Partners Search",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/business-partners/search",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "business-partners",
+                    "search"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
@@ -624,6 +688,36 @@
                 "catena",
                 "output",
                 "addresses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Business Partners Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Gate-Host}}/api/catena/input/business-partners/search",
+              "host": [
+                "{{Gate-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "input",
+                "business-partners",
+                "search"
               ]
             }
           },
