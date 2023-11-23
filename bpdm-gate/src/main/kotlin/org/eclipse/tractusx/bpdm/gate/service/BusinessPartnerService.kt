@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -38,10 +39,13 @@ import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository.Specs.byStage
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -69,15 +73,15 @@ class BusinessPartnerService(
         return upsertBusinessPartnersOutputFromCandidates(entities).map(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
-    fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputDto> {
+    fun getBusinessPartnersInput(pageRequest: PageRequest, searchRequest: BusinessPartnerSearchRequest): PageDto<BusinessPartnerInputDto> {
         val stage = StageType.Input
-        return getBusinessPartners(pageRequest, externalIds, stage)
+        return getBusinessPartners(pageRequest, searchRequest, stage)
             .toPageDto(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
-    fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputDto> {
+    fun getBusinessPartnersOutput(pageRequest: PageRequest, searchRequest: BusinessPartnerSearchRequest): PageDto<BusinessPartnerOutputDto> {
         val stage = StageType.Output
-        return getBusinessPartners(pageRequest, externalIds, stage)
+        return getBusinessPartners(pageRequest, searchRequest, stage)
             .toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
@@ -127,11 +131,18 @@ class BusinessPartnerService(
         return businessPartnerRepository.saveAll(partners)
     }
 
-    private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartner> {
-        return when {
-            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
-            else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
-        }
+    private fun getBusinessPartners(pageRequest: PageRequest, searchRequest: BusinessPartnerSearchRequest, stage: StageType): Page<BusinessPartner> {
+        val spec = Specification.allOf(
+            byStage(stage),
+            byExternalIdsIn(searchRequest.externalIds)
+        )
+        return businessPartnerRepository.findAll(spec, pageRequest)
+
+//        val externalIds = searchRequest.externalIds
+//        return when {
+//            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
+//            else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
+//        }
     }
 
     private fun saveChangelog(resolutionResults: Collection<ResolutionResult>) {

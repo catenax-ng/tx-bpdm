@@ -27,6 +27,7 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
@@ -74,10 +75,9 @@ interface GateBusinessPartnerApi {
     @PostMapping("/input/business-partners/search")
     @PostExchange("/input/business-partners/search")
     fun getBusinessPartnersInput(
-        @RequestBody externalIds: Collection<String>? = null,
+        @RequestBody searchRequest: BusinessPartnerSearchRequest? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<BusinessPartnerInputDto>
-
 
     @Operation(
         summary = "Search business partners by an array of external IDs from the output stage",
@@ -93,8 +93,7 @@ interface GateBusinessPartnerApi {
     @PostMapping("/output/business-partners/search")
     @PostExchange("/output/business-partners/search")
     fun getBusinessPartnersOutput(
-        @RequestBody externalIds: Collection<String>? = null,
+        @RequestBody searchRequest: BusinessPartnerSearchRequest? = null,
         @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<BusinessPartnerOutputDto>
-
 }

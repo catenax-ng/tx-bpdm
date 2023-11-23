@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.service.toPageRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
@@ -51,17 +52,23 @@ class BusinessPartnerController(
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getBusinessPartnersInput(
-        externalIds: Collection<String>?,
+        searchRequest: BusinessPartnerSearchRequest?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerInputDto> {
-        return businessPartnerService.getBusinessPartnersInput(paginationRequest.toPageRequest(), externalIds)
+        return businessPartnerService.getBusinessPartnersInput(
+            paginationRequest.toPageRequest(),
+            searchRequest ?: BusinessPartnerSearchRequest()
+        )
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getBusinessPartnersOutput(
-        externalIds: Collection<String>?,
+        searchRequest: BusinessPartnerSearchRequest?,
         paginationRequest: PaginationRequest
     ): PageDto<BusinessPartnerOutputDto> {
-        return businessPartnerService.getBusinessPartnersOutput(paginationRequest.toPageRequest(), externalIds)
+        return businessPartnerService.getBusinessPartnersOutput(
+            paginationRequest.toPageRequest(),
+            searchRequest ?: BusinessPartnerSearchRequest()
+        )
     }
 }
