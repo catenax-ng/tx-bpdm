@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
@@ -42,14 +43,11 @@ data class LogisticAddressVerboseDto(
     @get:Schema(description = LogisticAddressDescription.bpnLegalEntity)
     val bpnLegalEntity: String?,
 
-    @get:Schema(name = "isLegalAddress", description = LogisticAddressDescription.isLegalAddress)
-    val isLegalAddress: Boolean = false,
+    @get:Schema(name = "addressType", description = LogisticAddressDescription.addressType)
+    val addressType: AddressType? = null,
 
     @get:Schema(description = LogisticAddressDescription.bpnSite)
     val bpnSite: String?,
-
-    @get:Schema(name = "isMainAddress", description = LogisticAddressDescription.isMainAddress)
-    val isMainAddress: Boolean = false,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

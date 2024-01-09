@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
@@ -110,9 +111,7 @@ fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
     return LogisticAddressVerboseDto(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
-        isLegalAddress = legalEntity?.legalAddress == this,
         bpnSite = site?.bpn,
-        isMainAddress = site?.mainAddress == this,
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,
@@ -121,6 +120,7 @@ fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         confidenceCriteria = confidenceCriteria.toDto(),
+        addressType = getAddressType(this)
     )
 }
 
@@ -284,3 +284,20 @@ fun ConfidenceCriteria.toDto(): ConfidenceCriteriaDto =
         nextConfidenceCheckAt,
         confidenceLevel
     )
+
+private fun getAddressType(logisticAddress: LogisticAddress): AddressType {
+    return when {
+        logisticAddress.legalEntity?.legalAddress == logisticAddress &&
+                logisticAddress.site?.mainAddress == logisticAddress -> AddressType.LegalAndSiteMainAddress
+
+        logisticAddress.legalEntity?.legalAddress != logisticAddress &&
+                logisticAddress.site?.mainAddress != logisticAddress -> AddressType.AdditionalAddress
+
+        logisticAddress.legalEntity?.legalAddress == logisticAddress -> AddressType.LegalAddress
+
+        logisticAddress.site?.mainAddress == logisticAddress -> AddressType.SiteMainAddress
+
+        else -> throw IllegalStateException("Unable to determine address type.")
+    }
+}
+

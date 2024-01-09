@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -72,7 +73,7 @@ class AddressControllerIT @Autowired constructor(
             .let { bpnL -> requestAddressesOfLegalEntity(bpnL).content }
         // 1 legal address, 1 regular address
         assertThat(addressesByBpnL.size).isEqualTo(2)
-        assertThat(addressesByBpnL.count { it.isLegalAddress }).isEqualTo(1)
+        assertThat(addressesByBpnL.count { it.addressType == AddressType.LegalAddress }).isEqualTo(1)
 
         // Same address if we use the address-by-BPNA method
         addressesByBpnL
@@ -133,6 +134,7 @@ class AddressControllerIT @Autowired constructor(
         )
 
         assertAddressesAreEqual(searchResult.content, expected)
+
     }
 
     /**
@@ -161,7 +163,7 @@ class AddressControllerIT @Autowired constructor(
         val searchResult = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
-            BusinessPartnerVerboseValues.addressPartner2.copy(isLegalAddress = true),
+            BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.LegalAddress),
             BusinessPartnerVerboseValues.addressPartner3
         )
 
@@ -207,7 +209,7 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner1.copy(addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                     )
@@ -220,7 +222,7 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
@@ -233,11 +235,11 @@ class AddressControllerIT @Autowired constructor(
                 assertAddressesAreEqual(
                     it.content, listOf(
                         // site1
-                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner1.copy(addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                         // site2
-                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner2.copy(addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
@@ -531,7 +533,7 @@ class AddressControllerIT @Autowired constructor(
     private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
-        testHelpers.assertRecursively(actuals)
+        testHelpers.assertRecursively(actuals).ignoringCollectionOrderInFields()
             .ignoringFields(
                 LogisticAddressVerboseDto::bpna.name,
                 LogisticAddressVerboseDto::bpnLegalEntity.name,
