@@ -17,12 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.util
+package org.eclipse.tractusx.bpdm.test.containers
 
 
-import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer.Companion.bpdmPoolContainer
-import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer.Companion.bpdmPoolContainer
+import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
