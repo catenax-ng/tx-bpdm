@@ -43,6 +43,7 @@ import org.eclipse.tractusx.bpdm.test.containers.BpdmGateContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.test.testdata.minValidGateLegalEntity
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
@@ -84,9 +85,9 @@ class BridgeSyncIT @Autowired constructor(
     @Test
     fun `sync new legal entities`() {
         val gateLegalEntityRequests = listOf(
-            GateRequestValues.legalEntityGateInputRequest1,
-            GateRequestValues.legalEntityGateInputRequest2,
-            GateRequestValues.legalEntityGateInputRequest3
+            minValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
+            minValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
+            minValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
         )
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 

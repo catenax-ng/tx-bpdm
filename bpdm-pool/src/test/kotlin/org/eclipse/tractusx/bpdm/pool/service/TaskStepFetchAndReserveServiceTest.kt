@@ -1,53 +1,28 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ISiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.*
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
-import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
-import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteriaDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityClassificationDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityStateDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteStateDto
-import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
-import java.util.function.BiPredicate
 
 
 @SpringBootTest(
@@ -99,7 +74,6 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     @Test
     fun `create min legal entity`() {
-
         val leRefValue = "123"
         val leAddressRefValue = "222"
         val createLegalEntityRequest = minFullBusinessPartner().copy(
@@ -1217,227 +1191,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
         return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
     }
-
-    fun singleTaskStep(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepReservationEntryDto> {
-
-        return listOf(
-            TaskStepReservationEntryDto(
-                taskId = taskId,
-                businessPartner = businessPartner
-            )
-        )
-    }
-
-    fun multipleTaskStep(businessPartners: List<BusinessPartnerFullDto>): List<TaskStepReservationEntryDto> {
-
-        return businessPartners.map {
-            TaskStepReservationEntryDto(
-                taskId = it.legalEntity?.bpnLReference?.referenceValue!!,
-                businessPartner = it
-            )
-        }
-
-    }
-
-
-    fun minFullBusinessPartner(): BusinessPartnerFullDto {
-
-        return BusinessPartnerFullDto(generic = BusinessPartnerGenericDto())
-    }
-
-    fun emptyLegalEntity(): LegalEntityDto {
-
-        return LegalEntityDto()
-    }
-
-    fun minValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
-
-        return LegalEntityDto(
-            bpnLReference = bpnLReference,
-            legalName = "legalName_" + bpnLReference.referenceValue,
-            legalAddress = minLogisticAddress(bpnAReference = bpnAReference),
-            confidenceCriteria = fullConfidenceCriteria()
-        )
-    }
-
-    fun fullValidLegalEntity(bpnLReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): LegalEntityDto {
-
-        return LegalEntityDto(
-            bpnLReference = bpnLReference,
-            legalName = "legalName_" + bpnLReference.referenceValue,
-            legalShortName = "shortName_" + bpnLReference.referenceValue,
-            legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
-            identifiers = listOf(
-                legalEntityIdentifierDto(bpnLReference.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
-                legalEntityIdentifierDto(bpnLReference.referenceValue, 2L, BusinessPartnerVerboseValues.identifierType2)
-            ),
-            states = listOf(
-                legalEntityState(bpnLReference.referenceValue, 1L, BusinessStateType.ACTIVE),
-                legalEntityState(bpnLReference.referenceValue, 2L, BusinessStateType.INACTIVE)
-            ),
-            classifications = listOf(
-                classificationDto(bpnLReference.referenceValue, 1L, ClassificationType.NACE),
-                classificationDto(bpnLReference.referenceValue, 2L, ClassificationType.NAICS)
-            ),
-            legalAddress = fullLogisticAddressDto(bpnAReference),
-            confidenceCriteria = fullConfidenceCriteria()
-        )
-    }
-
-    fun legalEntityIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): LegalEntityIdentifierDto {
-
-        return LegalEntityIdentifierDto(
-            value = "value_" + name + "_" + id,
-            issuingBody = "issuingBody_" + name + "_" + id,
-            type = type.technicalKey
-        )
-    }
-
-    fun addressIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): AddressIdentifierDto {
-
-        return AddressIdentifierDto(
-            value = "value_" + name + "_" + id,
-            type = type.technicalKey
-        )
-    }
-
-    fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityStateDto {
-
-        return LegalEntityStateDto(
-            validFrom = LocalDateTime.now().plusDays(id),
-            validTo = LocalDateTime.now().plusDays(id + 2),
-            type = type
-        )
-    }
-
-    fun siteState(name: String, id: Long, type: BusinessStateType): SiteStateDto {
-
-        return SiteStateDto(
-            validFrom = LocalDateTime.now().plusDays(id),
-            validTo = LocalDateTime.now().plusDays(id + 2),
-            type = type
-        )
-    }
-
-    fun addressState(name: String, id: Long, type: BusinessStateType): AddressStateDto {
-
-        return AddressStateDto(
-            validFrom = LocalDateTime.now().plusDays(id),
-            validTo = LocalDateTime.now().plusDays(id + 2),
-            type = type
-        )
-    }
-
-
-    fun classificationDto(name: String, id: Long, type: ClassificationType): LegalEntityClassificationDto {
-
-        return LegalEntityClassificationDto(
-            code = "code_" + name + "_" + id,
-            value = "value_" + name + "_" + id,
-            type = type
-        )
-    }
-
-    fun minLogisticAddress(bpnAReference: BpnReferenceDto): LogisticAddressDto {
-
-        return LogisticAddressDto(
-            bpnAReference = bpnAReference,
-            physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference),
-            confidenceCriteria = fullConfidenceCriteria()
-        )
-    }
-
-    private fun minPhysicalPostalAddressDto(bpnAReference: BpnReferenceDto) = PhysicalPostalAddressDto(
-        country = CountryCode.DE,
-        city = "City_" + bpnAReference.referenceValue
-    )
-
-    fun fullLogisticAddressDto(bpnAReference: BpnReferenceDto): LogisticAddressDto {
-
-        return LogisticAddressDto(
-            bpnAReference = bpnAReference,
-            name = "name_" + bpnAReference.referenceValue,
-            identifiers = listOf(
-                addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
-                addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, ""))
-            ),
-            states = listOf(
-                addressState(bpnAReference.referenceValue, 1L, BusinessStateType.ACTIVE),
-                addressState(bpnAReference.referenceValue, 2L, BusinessStateType.INACTIVE)
-            ),
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(longitude = 1.1f, latitude = 2.2f, altitude = 3.3f),
-                country = CountryCode.DE,
-                administrativeAreaLevel1 = "AD-07",
-                administrativeAreaLevel2 = "adminArea2_" + bpnAReference.referenceValue,
-                administrativeAreaLevel3 = "adminArea3_" + bpnAReference.referenceValue,
-                postalCode = "postalCode_" + bpnAReference.referenceValue,
-                city = "city_" + bpnAReference.referenceValue,
-                street = StreetDto(
-                    name = "name_" + bpnAReference.referenceValue,
-                    houseNumber = "houseNumber_" + bpnAReference.referenceValue,
-                    houseNumberSupplement = "houseNumberSupplement_" + bpnAReference.referenceValue,
-                    milestone = "milestone_" + bpnAReference.referenceValue,
-                    direction = "direction_" + bpnAReference.referenceValue,
-                    namePrefix = "namePrefix_" + bpnAReference.referenceValue,
-                    additionalNamePrefix = "additionalNamePrefix_" + bpnAReference.referenceValue,
-                    nameSuffix = "nameSuffix_" + bpnAReference.referenceValue,
-                    additionalNameSuffix = "additionalNameSuffix_" + bpnAReference.referenceValue,
-                ),
-                district = "district_" + bpnAReference.referenceValue,
-                companyPostalCode = "companyPostalCode_" + bpnAReference.referenceValue,
-                industrialZone = "industrialZone_" + bpnAReference.referenceValue,
-                building = "building_" + bpnAReference.referenceValue,
-                floor = "floor_" + bpnAReference.referenceValue,
-                door = "door_" + bpnAReference.referenceValue,
-            ),
-            alternativePostalAddress = AlternativePostalAddressDto(
-                geographicCoordinates = GeoCoordinateDto(longitude = 12.3f, latitude = 4.56f, altitude = 7.89f),
-                country = CountryCode.DE,
-                administrativeAreaLevel1 = "DE-BW",
-                postalCode = "alternate_postalCode_" + bpnAReference.referenceValue,
-                city = "alternate_city_" + bpnAReference.referenceValue,
-                deliveryServiceType = DeliveryServiceType.PO_BOX,
-                deliveryServiceQualifier = "deliveryServiceQualifier_" + bpnAReference.referenceValue,
-                deliveryServiceNumber = "deliveryServiceNumber_" + bpnAReference.referenceValue,
-            ),
-            confidenceCriteria = fullConfidenceCriteria()
-        )
-    }
-
-    fun minValidSite(bpnSReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): SiteDto {
-
-        return SiteDto(
-            bpnSReference = bpnSReference,
-            name = "siteName_" + bpnSReference.referenceValue,
-            mainAddress = minLogisticAddress(bpnAReference = bpnAReference),
-            confidenceCriteria = fullConfidenceCriteria()
-        )
-    }
-
-    fun fullValidSite(bpnSReference: BpnReferenceDto, bpnAReference: BpnReferenceDto): SiteDto {
-
-        return SiteDto(
-            bpnSReference = bpnSReference,
-            name = "siteName_" + bpnSReference.referenceValue,
-            states = listOf(
-                siteState(bpnSReference.referenceValue, 1L, BusinessStateType.ACTIVE), siteState(bpnSReference.referenceValue, 2L, BusinessStateType.INACTIVE)
-            ),
-            mainAddress = fullLogisticAddressDto(bpnAReference),
-            confidenceCriteria = fullConfidenceCriteria()
-        )
-    }
-
-    fun fullConfidenceCriteria() =
-        ConfidenceCriteriaDto(
-            sharedByOwner = true,
-            numberOfBusinessPartners = 1,
-            checkedByExternalDataSource = true,
-            lastConfidenceCheckAt = LocalDateTime.now(),
-            nextConfidenceCheckAt = LocalDateTime.now().plusDays(1),
-            confidenceLevel = 10
-        )
-
+    
+   
     fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
 
         assertThat(step.taskId).isEqualTo(taskId)
@@ -1446,150 +1201,5 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     }
 
-    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntityDto?) {
-
-        val verboseLegalEntity = verboseRequest.legalEntity
-
-        assertThat(verboseLegalEntity.legalShortName).isEqualTo(legalEntity?.legalShortName)
-        assertThat(verboseLegalEntity.legalFormVerbose?.technicalKey).isEqualTo(legalEntity?.legalForm)
-        compareStates(verboseLegalEntity.states, legalEntity?.states)
-        compareClassifications(verboseLegalEntity.classifications, legalEntity?.classifications)
-        compareIdentifiers(verboseLegalEntity.identifiers, legalEntity?.identifiers)
-
-        val verboseLegalAddress = verboseRequest.legalAddress
-        assertThat(verboseLegalAddress.bpnLegalEntity).isEqualTo(legalEntity?.bpnLReference?.referenceValue)
-        assertThat(verboseLegalAddress.isLegalAddress).isTrue()
-        compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
-    }
-
-    fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: SiteDto?) {
-
-        val verboseSite = verboseRequest.site
-
-        assertThat(verboseSite.name).isEqualTo(site?.name)
-        assertThat(verboseSite.bpns).isEqualTo(site?.bpnSReference?.referenceValue)
-        compareSiteStates(verboseSite.states, site?.states)
-
-        val verboseMainAddress = verboseRequest.mainAddress
-        assertThat(verboseMainAddress.bpnSite).isEqualTo(site?.bpnSReference?.referenceValue)
-        val mainAddress = site?.mainAddress
-        assertThat(verboseMainAddress.isMainAddress).isTrue()
-        compareLogisticAddress(verboseMainAddress, mainAddress)
-    }
-
-    private fun compareLogisticAddress(verboseAddress: LogisticAddressVerboseDto, address: LogisticAddressDto?) {
-
-        assertThat(verboseAddress.name).isEqualTo(address?.name)
-        compareAddressStates(verboseAddress.states, address?.states)
-        compareAddressIdentifiers(verboseAddress.identifiers, address?.identifiers)
-
-
-        val verbosePhysicalAddress = verboseAddress.physicalPostalAddress
-        val physicalAddress = address?.physicalPostalAddress
-        assertThat(verbosePhysicalAddress).usingRecursiveComparison()
-            .ignoringFields(PhysicalPostalAddressVerboseDto::countryVerbose.name, PhysicalPostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
-            .isEqualTo(physicalAddress)
-        assertThat(verbosePhysicalAddress.country.name).isEqualTo(physicalAddress?.country?.name)
-        assertThat(verbosePhysicalAddress.administrativeAreaLevel1).isEqualTo(physicalAddress?.administrativeAreaLevel1)
-        val verboseAlternAddress = verboseAddress.alternativePostalAddress
-        val alternAddress = address?.alternativePostalAddress
-        assertThat(verboseAlternAddress).usingRecursiveComparison()
-            .ignoringFields(AlternativePostalAddressVerboseDto::countryVerbose.name, AlternativePostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
-            .isEqualTo(alternAddress)
-        assertThat(verboseAlternAddress?.country?.name).isEqualTo(alternAddress?.country?.name)
-        assertThat(verboseAlternAddress?.administrativeAreaLevel1).isEqualTo(alternAddress?.administrativeAreaLevel1)
-    }
-
-    fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseDto>, states: Collection<AddressStateDto>?) {
-
-        assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
-        val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
-        val sortedStates = states?.sortedBy { it.validFrom }
-        sortedVerboseStates.indices.forEach {
-            assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
-            assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validTo.name)
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validFrom.name)
-                .ignoringFields(AddressStateVerboseDto::typeVerbose.name).isEqualTo(sortedStates[it])
-        }
-    }
-
-    fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseDto>, identifiers: Collection<AddressIdentifierDto>?) {
-
-        assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
-        val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.typeVerbose.name }
-        val sortedIdentifiers = identifiers!!.sortedBy { it.type }
-        sortedVerboseIdentifiers.indices.forEach {
-            assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
-            assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields(AddressIdentifierVerboseDto::typeVerbose.name)
-                .isEqualTo(sortedIdentifiers[it])
-        }
-    }
-
-    fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>, states: Collection<ILegalEntityStateDto>?) {
-
-        assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
-        val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
-        val sortedStates = states!!.sortedBy { it.validFrom }
-        sortedVerboseStates.indices.forEach {
-            assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
-            assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validTo.name )
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validFrom.name)
-                .ignoringFields(LegalEntityStateVerboseDto::typeVerbose.name)
-                .isEqualTo(sortedStates[it])
-        }
-    }
-
-    fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Collection<ISiteStateDto>?) {
-
-        assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
-        val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
-        val sortedStates = states!!.sortedBy { it.validFrom }
-        sortedVerboseStates.indices.forEach {
-            assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
-            assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validTo.name)
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validFrom.name)
-                .ignoringFields(SiteStateVerboseDto::typeVerbose.name)
-                .isEqualTo(sortedStates[it])
-        }
-    }
-
-    fun isEqualToIgnoringMilliseconds(): BiPredicate<LocalDateTime?, LocalDateTime?> {
-        return BiPredicate<LocalDateTime?, LocalDateTime?> { d1, d2 ->
-            (d1 == null && d2 == null)
-                    || d1.truncatedTo(ChronoUnit.SECONDS).equals(d2.truncatedTo(ChronoUnit.SECONDS))
-        }
-    }
-
-    fun compareClassifications(
-        classificationsVerbose: Collection<LegalEntityClassificationVerboseDto>,
-        classifications: Collection<LegalEntityClassificationDto>?
-    ) {
-
-        assertThat(classificationsVerbose.size).isEqualTo(classifications?.size ?: 0)
-        val sortedVerboseClassifications = classificationsVerbose.sortedBy { it.typeVerbose.name }
-        val sortedClassifications = classifications!!.sortedBy { it.type.name }
-        sortedVerboseClassifications.indices.forEach {
-            assertThat(sortedVerboseClassifications[it].typeVerbose.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
-            assertThat(sortedVerboseClassifications[it]).usingRecursiveComparison()
-                .ignoringFields(LegalEntityClassificationVerboseDto::typeVerbose.name)
-                .isEqualTo(sortedClassifications[it])
-        }
-    }
-
-    fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseDto>, identifiers: Collection<LegalEntityIdentifierDto>?) {
-
-        assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
-        val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.typeVerbose.name }
-        val sortedIdentifiers = identifiers!!.sortedBy { it.type }
-        sortedVerboseIdentifiers.indices.forEach {
-            assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
-            assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields(LegalEntityIdentifierVerboseDto::typeVerbose.name).isEqualTo(sortedIdentifiers[it])
-        }
-    }
 
 }

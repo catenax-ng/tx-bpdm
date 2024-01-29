@@ -17,24 +17,31 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.test.util
+package org.eclipse.tractusx.bpdm.test.testdata
 
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.RecursiveComparisonAssert
-import org.springframework.stereotype.Component
-import java.time.Instant
-import java.time.LocalDateTime
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerFullDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
 
-@Component
-class AssertHelpers {
 
-    fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
-        return Assertions.assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringCollectionOrder()
-            .ignoringAllOverriddenEquals()
-            .ignoringFieldsOfTypes(Instant::class.java, LocalDateTime::class.java)
+fun singleTaskStep(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepReservationEntryDto> {
+    return listOf(
+        TaskStepReservationEntryDto(
+            taskId = taskId,
+            businessPartner = businessPartner
+        )
+    )
+}
+
+fun multipleTaskStep(businessPartners: List<BusinessPartnerFullDto>): List<TaskStepReservationEntryDto> {
+
+    return businessPartners.map {
+        TaskStepReservationEntryDto(
+            taskId = it.legalEntity?.bpnLReference?.referenceValue!!,
+            businessPartner = it
+        )
     }
 
-
 }
+
+
+

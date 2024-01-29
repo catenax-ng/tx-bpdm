@@ -233,12 +233,12 @@ object GateRequestValues {
     )
 
     val legalEntity2 = LegalEntityDto(
-        identifiers = listOf(identifier3, identifier4),
-        legalNameParts = listOf(BusinessPartnerVerboseValues.name3),
-        legalShortName = BusinessPartnerVerboseValues.shortName3,
-        legalForm = BusinessPartnerVerboseValues.legalFormTechnicalKey2,
-        states = listOf(leBusinessStatus2),
-        classifications = listOf(classification3, classification4),
+        identifiers = listOf(identifier1, identifier2),
+        legalNameParts = listOf(BusinessPartnerVerboseValues.name1),
+        legalShortName = BusinessPartnerVerboseValues.shortName1,
+        legalForm = BusinessPartnerVerboseValues.legalFormTechnicalKey1,
+        states = listOf(leBusinessStatus1),
+        classifications = listOf(classification1, classification2),
     )
 
     val legalEntity3 = LegalEntityDto(
