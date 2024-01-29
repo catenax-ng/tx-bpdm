@@ -257,7 +257,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = bpnAReference
             ).copy(
                 legalAddress = minLogisticAddress(bpnAReference).copy(
-                    physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference).copy(
+                    physicalPostalAddress = fullGatePhysicalPostalAddressDto(bpnAReference).copy(
                         administrativeAreaLevel1 = "Invalid"
                     )
                 )
@@ -736,7 +736,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
             ).copy(
                 mainAddress = minLogisticAddress(bpnAReference).copy(
-                    physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference).copy(
+                    physicalPostalAddress = fullGatePhysicalPostalAddressDto(bpnAReference).copy(
                         administrativeAreaLevel1 = "Invalid"
                     ),
                     identifiers = listOf(
@@ -745,7 +745,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 )
             ),
             address = minLogisticAddress(additionalReference).copy(
-                physicalPostalAddress = minPhysicalPostalAddressDto(additionalReference).copy(
+                physicalPostalAddress = fullGatePhysicalPostalAddressDto(additionalReference).copy(
                     administrativeAreaLevel1 = "InvalidAdditional"
                 ),
                 identifiers = listOf(
@@ -890,7 +890,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 name = "Changed Site",
                 hasChanged = true,
                 mainAddress = createResult[0].businessPartner?.site?.mainAddress?.copy(
-                    physicalPostalAddress = minPhysicalPostalAddressDto(bpnASiteReference).copy(
+                    physicalPostalAddress = fullGatePhysicalPostalAddressDto(bpnASiteReference).copy(
                         administrativeAreaLevel1 = "Invalid"
                     ),
                     identifiers = listOf(
@@ -899,7 +899,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 )
             ),
             address = minLogisticAddress(additionalReference).copy(
-                physicalPostalAddress = minPhysicalPostalAddressDto(additionalReference).copy(
+                physicalPostalAddress = fullGatePhysicalPostalAddressDto(additionalReference).copy(
                     administrativeAreaLevel1 = "InvalidAdditional"
                 ),
                 identifiers = listOf(

@@ -42,8 +42,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.test.containers.BpdmGateContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.fullValidGateLegalEntity
+import org.eclipse.tractusx.bpdm.test.testdata.fullValidGateSite
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.test.testdata.minValidGateLegalEntity
 import org.eclipse.tractusx.bpdm.test.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.test.util.PoolDataHelpers
 import org.junit.jupiter.api.BeforeEach
@@ -85,9 +86,9 @@ class BridgeSyncIT @Autowired constructor(
     @Test
     fun `sync new legal entities`() {
         val gateLegalEntityRequests = listOf(
-            minValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
-            minValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
-            minValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
         )
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
@@ -128,15 +129,15 @@ class BridgeSyncIT @Autowired constructor(
     fun `sync new sites`() {
         // site needs parent legal entity!
         val gateLegalEntityRequests = listOf(
-            GateRequestValues.legalEntityGateInputRequest1,
-            GateRequestValues.legalEntityGateInputRequest2,
-            GateRequestValues.legalEntityGateInputRequest3
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
         )
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
         val gateSiteRequests = listOf(
-            GateRequestValues.siteGateInputRequest1,
-            GateRequestValues.siteGateInputRequest2
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId1),
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId2)
         )
         gateClient.sites.upsertSites(gateSiteRequests)
 
