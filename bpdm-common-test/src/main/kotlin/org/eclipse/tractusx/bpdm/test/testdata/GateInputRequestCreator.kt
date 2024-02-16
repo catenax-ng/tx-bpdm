@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.test.testdata
 
+
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -27,29 +28,39 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.test.testdata.pool.BusinessPartnerVerboseValues
-
-
 import java.time.LocalDateTime
 
 
 fun fullValidGateLegalEntity(externalId: String): LegalEntityGateInputRequest {
 
-    return LegalEntityGateInputRequest(fullGateLegalEntity(externalId), fullGateLogisticAddress(externalId), externalId)
+    return LegalEntityGateInputRequest(fullGateLegalEntity(externalId), fullGateLogisticAddress(externalId), externalId =
+    "legal_entity_$externalId")
 }
 
 fun fullValidGateSite(externalId: String): SiteGateInputRequest {
 
-    return SiteGateInputRequest(fullGateSite(externalId), fullGateLogisticAddress("site_$externalId"), "site_$externalId", externalId)
+    return SiteGateInputRequest(fullGateSite(externalId), fullGateLogisticAddress(externalId),
+        externalId = "site_$externalId",
+        legalEntityExternalId = "legal_entity_$externalId"
+        )
+}
+
+fun fullValidGateAddress(externalId: String): AddressGateInputRequest {
+
+    return AddressGateInputRequest(fullGateLogisticAddress("$externalId"),
+        externalId = "address_$externalId",
+        legalEntityExternalId = "legal_entity_$externalId",
+        siteExternalId = "site_$externalId")
 }
 
 fun fullGateSite(externalId: String): SiteGateDto {
 
     return SiteGateDto(
-        nameParts = listOf("legal_name_parts", externalId),
+        nameParts = listOf("legal_name_parts"),
         states = listOf(
             fullGateSiteState(
                 externalId, 1L,
@@ -72,7 +83,7 @@ fun fullGateLegalEntity(externalId: String): LegalEntityDto {
             fullGateLegalIdentifierDto(externalId, 1L, BusinessPartnerVerboseValues.identifierType1),
             fullGateLegalIdentifierDto(externalId, 2L, BusinessPartnerVerboseValues.identifierType2)
         ),
-        legalNameParts = listOf("legal_name_parts", externalId),
+        legalNameParts = listOf("legal_name_parts"),
         legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
         states = listOf(
             fullGateLegalEntityState(
@@ -94,18 +105,9 @@ fun fullGateLegalEntity(externalId: String): LegalEntityDto {
 fun fullGateLogisticAddress(externalId: String): LogisticAddressDto {
 
     return LogisticAddressDto(
-        nameParts = listOf("name_parts", externalId),
+        nameParts = listOf("name_parts"),
         identifiers = listOf(
-            fullGateAddressIdentifierDto(
-                externalId,
-                1L,
-                TypeKeyNameVerboseDto(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1.technicalKey, "")
-            ),
-            fullGateAddressIdentifierDto(
-                externalId,
-                2L,
-                TypeKeyNameVerboseDto(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2.technicalKey, "")
-            )
+
         ),
         states = listOf(
             fullGateAddressState(externalId, 1L, BusinessStateType.ACTIVE),

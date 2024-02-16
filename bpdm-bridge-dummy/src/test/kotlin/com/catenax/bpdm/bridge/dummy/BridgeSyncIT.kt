@@ -20,8 +20,6 @@
 package com.catenax.bpdm.bridge.dummy
 
 import com.catenax.bpdm.bridge.dummy.client.BridgeClient
-import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues
-import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues.addressGateInputRequest1
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -42,6 +40,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerb
 import org.eclipse.tractusx.bpdm.test.containers.BpdmGateContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.BpdmPoolContextInitializer
 import org.eclipse.tractusx.bpdm.test.containers.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.test.testdata.fullValidGateAddress
 import org.eclipse.tractusx.bpdm.test.testdata.fullValidGateLegalEntity
 import org.eclipse.tractusx.bpdm.test.testdata.fullValidGateSite
 import org.eclipse.tractusx.bpdm.test.testdata.gate.BusinessPartnerVerboseValues
@@ -53,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+
 
 private val DEFAULT_PAGINATION_REQUEST = PaginationRequest(0, 100)
 
@@ -177,18 +177,27 @@ class BridgeSyncIT @Autowired constructor(
     @Test
     fun `sync new addresses`() {
         // address needs parent legal entity and site!
-        val gateLegalEntityRequests = listOf(
-            GateRequestValues.legalEntityGateInputRequest1,
+        val gateLegalEntityRequests2 = listOf(
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
         )
-        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
-        val gateSiteRequests = listOf(
-            GateRequestValues.siteGateInputRequest1,
+
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests2)
+
+        val gateSiteRequests2 = listOf(
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId1),
         )
-        gateClient.sites.upsertSites(gateSiteRequests)
+
+        gateClient.sites.upsertSites(gateSiteRequests2)
+
 
         val gateAddressRequests = listOf(
-            addressGateInputRequest1,
-            GateRequestValues.addressGateInputRequest2
+            fullValidGateAddress(BusinessPartnerVerboseValues.externalId1).copy(siteExternalId = null,
+                legalEntityExternalId = fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1).externalId),
+            fullValidGateAddress(BusinessPartnerVerboseValues.externalId2).copy(legalEntityExternalId =
+            null, siteExternalId = fullValidGateSite(BusinessPartnerVerboseValues.externalId1).externalId
+            )
+
+
         )
         gateClient.addresses.upsertAddresses(gateAddressRequests)
 
@@ -228,9 +237,9 @@ class BridgeSyncIT @Autowired constructor(
     @Test
     fun `sync updated legal entities`() {
         val gateLegalEntityRequests = listOf(
-            GateRequestValues.legalEntityGateInputRequest1,
-            GateRequestValues.legalEntityGateInputRequest2,
-            GateRequestValues.legalEntityGateInputRequest3
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
         )
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
         assertGateChangelogHasCount(3 + 3)
@@ -248,14 +257,32 @@ class BridgeSyncIT @Autowired constructor(
         }
 
         // update legal entity and le address and trigger sync
-        val leRquestUpdate = GateRequestValues.legalEntityGateInputRequest1.copy(
-            legalEntity = GateRequestValues.legalEntity1.copy(legalShortName = "ChangedShortNam"),
-            legalAddress = GateRequestValues.address1.copy(
-                physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetDto(name = "Changed Street Entiy", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
+//        val leRquestUpdate = GateRequestValues.legalEntityGateInputRequest1.copy(
+//            legalEntity = GateRequestValues.legalEntity1.copy(legalShortName = "ChangedShortNam"),
+//            legalAddress = GateRequestValues.address1.copy(
+//                physicalPostalAddress = GateRequestValues.postalAddress1.copy(
+//                    street = StreetDto(name = "Changed Street Entiy", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
+//                ),
+//            ),
+//        )
+
+        val leRquestUpdate =
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1).copy(
+                legalEntity = fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1).legalEntity.copy(
+                    legalShortName = "ChangedShortNam"
                 ),
-            ),
-        )
+                legalAddress = fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1).legalAddress.copy(
+                    physicalPostalAddress = fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1).legalAddress.physicalPostalAddress.copy(
+                        street = StreetDto(
+                            name = "Changed Street Entiy",
+                            houseNumber = BusinessPartnerVerboseValues.houseNumber1,
+                            direction = BusinessPartnerVerboseValues.direction1
+                        )
+                    )
+                )
+            )
+
+
         gateClient.legalEntities.upsertLegalEntities(listOf(leRquestUpdate))
         assertGateChangelogHasCount(4 + 4) // 3 insert + 1 update
         bridgeClient.bridge().triggerSync()
@@ -265,8 +292,8 @@ class BridgeSyncIT @Autowired constructor(
         assertThat(legalEntitiesFromPool.size).isEqualTo(3)
         val gateLegalEntityUpdateRequestsByBpn = listOf(
             leRquestUpdate,
-            GateRequestValues.legalEntityGateInputRequest2,
-            GateRequestValues.legalEntityGateInputRequest3
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
         ).associateBy { bpnByExternalId[it.externalId]!! }
 
         entitiesFromPoolAFterUpdate.forEach { poolLe ->
@@ -278,15 +305,16 @@ class BridgeSyncIT @Autowired constructor(
     fun `sync update sites`() {
         // site needs parent legal entity!
         val gateLegalEntityRequests = listOf(
-            GateRequestValues.legalEntityGateInputRequest1,
-            GateRequestValues.legalEntityGateInputRequest2,
-            GateRequestValues.legalEntityGateInputRequest3
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId2),
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId3)
         )
+
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
         val gateSiteRequests = listOf(
-            GateRequestValues.siteGateInputRequest1,
-            GateRequestValues.siteGateInputRequest2
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId1),
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId2)
         )
         gateClient.sites.upsertSites(gateSiteRequests)
 
@@ -315,11 +343,15 @@ class BridgeSyncIT @Autowired constructor(
         }
 
         // update site and main address and trigger sync
-        val siteRquestUpdate = GateRequestValues.siteGateInputRequest1.copy(
-            site = GateRequestValues.site1.copy(nameParts = listOf("ChangedNamePart1")),
-            mainAddress = GateRequestValues.address1.copy(
-                physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetDto(name = "Changed Street Site", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1),
+        val siteRquestUpdate = fullValidGateSite(BusinessPartnerVerboseValues.externalId1).copy(
+            site = fullValidGateSite(BusinessPartnerVerboseValues.externalId1).site.copy(nameParts = listOf("ChangedNamePart1")),
+            mainAddress = fullValidGateSite(BusinessPartnerVerboseValues.externalId1).mainAddress.copy(
+                physicalPostalAddress = fullValidGateSite(BusinessPartnerVerboseValues.externalId1).mainAddress.physicalPostalAddress.copy(
+                    street = StreetDto(
+                        name = "Changed Street Site",
+                        houseNumber = BusinessPartnerVerboseValues.houseNumber1,
+                        direction = BusinessPartnerVerboseValues.direction1
+                    ),
                 ),
             )
         )
@@ -332,7 +364,7 @@ class BridgeSyncIT @Autowired constructor(
 
         val gateSiteUpdateRequestsByBpn = listOf(
             siteRquestUpdate,
-            GateRequestValues.siteGateInputRequest2
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId2)
         ).associateBy { bpnByExternalId[it.externalId]!! }
 
         poolSiteUpdateResponses.content.forEach { poolSite ->
@@ -344,20 +376,31 @@ class BridgeSyncIT @Autowired constructor(
     @Test
     fun `sync update addresses`() {
         // insert le, sites and addresses
-        val gateLegalEntityRequests = listOf(
-            GateRequestValues.legalEntityGateInputRequest1,
-        )
-        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
-        val gateSiteRequests = listOf(
-            GateRequestValues.siteGateInputRequest1,
-        )
-        gateClient.sites.upsertSites(gateSiteRequests)
 
-        val gateAddressRequests = listOf(
-            addressGateInputRequest1,
-            GateRequestValues.addressGateInputRequest2
+        val gateLegalEntityRequests2 = listOf(
+            fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1),
         )
-        gateClient.addresses.upsertAddresses(gateAddressRequests)
+
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests2)
+
+        val gateSiteRequests2 = listOf(
+            fullValidGateSite(BusinessPartnerVerboseValues.externalId1),
+        )
+
+        gateClient.sites.upsertSites(gateSiteRequests2)
+
+
+        val gateAddressRequests3 = listOf(
+            fullValidGateAddress(BusinessPartnerVerboseValues.externalId1).copy(siteExternalId = null,
+                legalEntityExternalId = fullValidGateLegalEntity(BusinessPartnerVerboseValues.externalId1).externalId),
+            fullValidGateAddress(BusinessPartnerVerboseValues.externalId2).copy(legalEntityExternalId =
+                null, siteExternalId = fullValidGateSite(BusinessPartnerVerboseValues.externalId1).externalId
+            )
+
+
+        )
+
+        gateClient.addresses.upsertAddresses(gateAddressRequests3)
 
         assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + le address + 1 site + main address + 2 addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
@@ -369,7 +412,7 @@ class BridgeSyncIT @Autowired constructor(
         assertPoolChangelogHasCount(1 + 1 + 1 + 1 + 2)
 
         val bpnByExternalId = buildBpnByExternalIdMap(readSuccessfulSharingStatesWithBpn())
-        val gateAddressRequestsByBpn = gateAddressRequests.associateBy { bpnByExternalId[it.externalId]!! }
+        val gateAddressRequestsByBpn = gateAddressRequests3.associateBy { bpnByExternalId[it.externalId]!! }
 
         val poolAddressResponses = poolClient.addresses.searchAddresses(
             addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
@@ -382,12 +425,19 @@ class BridgeSyncIT @Autowired constructor(
         }
 
         // update address nad trigger sync
-        val addressRequestUpdate = addressGateInputRequest1.copy(
-            address = GateRequestValues.address1.copy(
+        val addressRequestUpdate = fullValidGateAddress(BusinessPartnerVerboseValues.externalId1).copy(
+            address = fullValidGateAddress(BusinessPartnerVerboseValues.externalId1).address.copy(
                 nameParts = listOf("Changed Address Name"),
-                physicalPostalAddress = GateRequestValues.postalAddress1
-                    .copy(street = StreetDto(name = "UpdateSteet", houseNumber = BusinessPartnerVerboseValues.houseNumber1, direction = BusinessPartnerVerboseValues.direction1))
+                physicalPostalAddress = fullValidGateAddress(BusinessPartnerVerboseValues.externalId1).address.physicalPostalAddress
+                    .copy(
+                        street = StreetDto(
+                            name = "UpdateSteet",
+                            houseNumber = BusinessPartnerVerboseValues.houseNumber1,
+                            direction = BusinessPartnerVerboseValues.direction1
+                        )
+                    )
             ),
+            siteExternalId = null,
 
             )
         gateClient.addresses.upsertAddresses(listOf(addressRequestUpdate))
@@ -399,7 +449,7 @@ class BridgeSyncIT @Autowired constructor(
 
         val gateAddressUpdateRequestsByBpn = listOf(
             addressRequestUpdate,
-            GateRequestValues.addressGateInputRequest2
+            fullValidGateAddress(BusinessPartnerVerboseValues.externalId2)
         ).associateBy { bpnByExternalId[it.externalId]!! }
 
         poolAddressUpdateResponses.forEach { poolVersion ->
