@@ -97,6 +97,28 @@ If the upserted input data is identical to the existing input data, neither a ch
 
 A cleaning service provider has responsibility for implementing a specific part of the golden record process like duplication check and/or enriching data.
 
+### Receive Golden Record Update
+
+Postman collection request ID: S.CG
+
+There are two ways in which a sharing member's business partner record in the output stage may receive an update.
+One way is covered in the previous section, that is, a sharing member providing the update to the record themselves and sending it to the golden record process.
+The result of the golden record process is then written to the record's output stage.
+Another, more indirect way, is an update based on a golden record update in the Pool:
+
+1. Sharing Member A updates a record like described in the previous section
+2. Based on the record's data the golden record in the Pool is updated as well
+3. Now it is necessary to propagate that update to all sharing member's records which are associated to the updated golden record
+
+This is the second way how sharing member records in the output stage may be updated.
+As described above, the source of this update is not the sharing member themselves but a change in the golden record - or if you will - the update of another sharing member.
+Based on this trigger the sharing member record enters the golden record process to be updated itself.
+This means, one update to the golden record may trigger an update process of several sharing member records.
+
+Like for creating and updating a sharing member record in the previous section, the record's sharing state can be queried.
+Finally, after the record went through the golden record process, its output stage is updated.
+
+
 ## VAS Provider View
 
 A VAS provider uses golden records to provide an value-added service to the Catena-X community.
@@ -105,7 +127,7 @@ A VAS provider uses golden records to provide an value-added service to the Cate
 
 This section details how a sharing member EDC can access an EDC exposing the BPDM API as assets. Before you can access the assets make sure that the BPDM EDC
 has been configured to provide assets for your company's BPN (see [Operator View](OPERATOR_VIEW.md)).
-This [POSTMAN collection](postman/EDC_BPDM_Usage.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
+This [POSTMAN collection](postman/EDC-BPDM Automated Test.postman_collection.json) gives example requests for communicating with a deployed BPDM EDC over a sharing
 member EDC.
 In general, in order to access API endpoints you need to accept the contract of the corresponding asset first, then require a temporary access token for the
 asset and finally send that access token over your own EDC to the BPDM EDC in order to receive the endpoint's response. The following list details these steps:
